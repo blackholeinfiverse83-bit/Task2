@@ -1,0 +1,682 @@
+[
+  {
+    "id": "scraped_1764572537497_iz57mqb03",
+    "title": "BBC Sport",
+    "description": "'Qatar GP shows anything can happen in three-way title showdown' Formula 1 is heading into its first final-race championship showdown between more ...",
+    "url": "https://www.bbc.com/sport",
+    "source": "Bbc",
+    "category": "general",
+    "imageUrl": "https://img.youtube.com/vi/2vXs37AacI8/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "1 min read",
+    "scrapedAt": "2025-12-01T07:02:17.497Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/sport",
+      "timestamp": "2025-12-01T12:31:47.381178",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 1.55,
+        "vetting": 0,
+        "summarization": 2.74,
+        "prompt_generation": 0.39,
+        "video_search": 25.43
+      },
+      "scraped_data": {
+        "title": "BBC Sport",
+        "content_length": 259,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 74.5,
+        "credibility_rating": "Medium",
+        "is_reliable": true,
+        "reliability_status": "Questionable",
+        "authenticity_level": "MEDIUM",
+        "recommendation": "Verify with additional sources",
+        "confidence": 0.6,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 70,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 0,
+            "word_count": 42,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 28,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2025-12-01T12:31:48.933300",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "'Qatar GP shows anything can happen in three-way title showdown' Formula 1 is heading into its first final-race championship showdown between more ...",
+        "original_length": 259,
+        "summary_length": 150,
+        "compression_ratio": 57.9
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: BBC Sport with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "2vXs37AacI8",
+            "title": "Senior Duty Editor, BBC Sports News",
+            "description": "YouTube video about BBC Sport news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/2vXs37AacI8/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "duration": "Unknown",
+            "views": "Unknown",
+            "published_at": "2025-12-01T12:32:13.992695",
+            "url": "https://www.youtube.com/watch?v=2vXs37AacI8",
+            "embed_url": "https://www.youtube.com/embed/2vXs37AacI8",
+            "relevance_score": 0.9,
+            "scraped": true,
+            "real_video": true
+          }
+        ],
+        "total_found": 1,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 30.11,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "'Qatar GP shows anything can happen in three-way title showdown' Formula 1 is heading into its first final-race championship showdown between more ...",
+    "insights": {
+      "authenticity_score": 74.5,
+      "credibility_rating": "Medium",
+      "is_reliable": true,
+      "reliability_status": "Questionable",
+      "authenticity_level": "MEDIUM",
+      "recommendation": "Verify with additional sources",
+      "confidence": 0.6,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 70,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 0,
+          "quotes": 0,
+          "word_count": 42,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 80,
+          "bias_level": "NEUTRAL",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 0,
+            "sensationalist": 0,
+            "objective": 0
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 28,
+        "cross_verification": 12,
+        "bias_analysis": 12
+      },
+      "analyzed_at": "2025-12-01T12:31:48.933300",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "Senior Duty Editor, BBC Sports News",
+        "url": "https://www.youtube.com/watch?v=2vXs37AacI8",
+        "thumbnail": "https://img.youtube.com/vi/2vXs37AacI8/mqdefault.jpg",
+        "duration": "Unknown",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2025-12-01T07:02:17.504Z"
+  },
+  {
+    "id": "scraped_1764146485875_f8140e735",
+    "title": "Foreign tourists to pay extra fee to visit US national parks",
+    "description": "Foreign tourists to pay extra fee to visit US national parks 7 hours ago Share Save Osmond Chia Business reporter Share Save Getty Images Yosemite ...",
+    "url": "https://www.bbc.com/news/articles/c1kpnxvpgy2o",
+    "source": "Bbc",
+    "category": "business",
+    "imageUrl": "https://img.youtube.com/vi/NpZfSbopeHU/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "3 min read",
+    "scrapedAt": "2025-11-26T08:41:25.875Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/news/articles/c1kpnxvpgy2o",
+      "timestamp": "2025-11-26T14:11:02.665428",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 0.35,
+        "vetting": 0,
+        "summarization": 0.7,
+        "prompt_generation": 0.22,
+        "video_search": 21.93
+      },
+      "scraped_data": {
+        "title": "Foreign tourists to pay extra fee to visit US national parks",
+        "content_length": 2326,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 82.1,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 89,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 3,
+            "word_count": 377,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 35.6,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2025-11-26T14:11:03.011514",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "Foreign tourists to pay extra fee to visit US national parks 7 hours ago Share Save Osmond Chia Business reporter Share Save Getty Images Yosemite ...",
+        "original_length": 2326,
+        "summary_length": 150,
+        "compression_ratio": 6.4
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: Foreign tourists to pay extra fee to visit US national parks with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "NpZfSbopeHU",
+            "title": "Experts say Trump administration's new international visitor fees may impact national park tourism",
+            "description": "YouTube video about Foreign tourists to pay extra fee to visit US national parks news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/NpZfSbopeHU/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "duration": "Unknown",
+            "views": "Unknown",
+            "published_at": "2025-11-26T14:11:24.115538",
+            "url": "https://www.youtube.com/watch?v=NpZfSbopeHU",
+            "embed_url": "https://www.youtube.com/embed/NpZfSbopeHU",
+            "relevance_score": 0.9,
+            "scraped": true,
+            "real_video": true
+          }
+        ],
+        "total_found": 1,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 23.2,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "Foreign tourists to pay extra fee to visit US national parks 7 hours ago Share Save Osmond Chia Business reporter Share Save Getty Images Yosemite ...",
+    "insights": {
+      "authenticity_score": 82.1,
+      "credibility_rating": "High",
+      "is_reliable": true,
+      "reliability_status": "Reliable",
+      "authenticity_level": "HIGH",
+      "recommendation": "Credible news source",
+      "confidence": 0.85,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 89,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 0,
+          "quotes": 3,
+          "word_count": 377,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 80,
+          "bias_level": "NEUTRAL",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 0,
+            "sensationalist": 0,
+            "objective": 0
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 35.6,
+        "cross_verification": 12,
+        "bias_analysis": 12
+      },
+      "analyzed_at": "2025-11-26T14:11:03.011514",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "Experts say Trump administration's new international visitor fees may impact national park tourism",
+        "url": "https://www.youtube.com/watch?v=NpZfSbopeHU",
+        "thumbnail": "https://img.youtube.com/vi/NpZfSbopeHU/mqdefault.jpg",
+        "duration": "Unknown",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2025-11-26T08:41:26.244Z"
+  },
+  {
+    "id": "scraped_1763707310944_7abmhwtxi",
+    "title": "Zelensky ready for 'honest work' with US to end Ukraine war",
+    "description": "Zelensky ready for 'honest work' with US to end Ukraine war 45 minutes ago Share Save Laura Gozzi and James Chater Share Save Russia advances in Uk...",
+    "url": "https://www.bbc.com/news/articles/cly1ypqlle0o",
+    "source": "Bbc",
+    "category": "general",
+    "imageUrl": "https://img.youtube.com/vi/9XdWxDa0kTY/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "6 min read",
+    "scrapedAt": "2025-11-21T06:41:50.944Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/news/articles/cly1ypqlle0o",
+      "timestamp": "2025-11-21T12:11:33.581323",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 1.38,
+        "vetting": 0,
+        "summarization": 2.13,
+        "prompt_generation": 0.35,
+        "video_search": 10.98
+      },
+      "scraped_data": {
+        "title": "Zelensky ready for 'honest work' with US to end Ukraine war",
+        "content_length": 5839,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 86,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 1,
+            "quotes": 21,
+            "word_count": 980,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 90,
+            "bias_level": "OBJECTIVE",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 1
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 13.5
+        },
+        "analyzed_at": "2025-11-21T12:11:34.963228",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "Zelensky ready for 'honest work' with US to end Ukraine war 45 minutes ago Share Save Laura Gozzi and James Chater Share Save Russia advances in Uk...",
+        "original_length": 5839,
+        "summary_length": 150,
+        "compression_ratio": 2.6
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: Zelensky ready for 'honest work' with US to end Ukraine war with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "9XdWxDa0kTY",
+            "title": "Russia Ukraine War | Zelensky Says He Is Ready To Work On US Backed Plan To End War In Ukraine | 4K",
+            "description": "YouTube video about Zelensky ready for 'honest work' with US to end Ukraine war news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/9XdWxDa0kTY/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "duration": "Unknown",
+            "views": "Unknown",
+            "published_at": "2025-11-21T12:11:45.205313",
+            "url": "https://www.youtube.com/watch?v=9XdWxDa0kTY",
+            "embed_url": "https://www.youtube.com/embed/9XdWxDa0kTY",
+            "relevance_score": 0.9,
+            "scraped": true,
+            "real_video": true
+          }
+        ],
+        "total_found": 1,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 14.84,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "Zelensky ready for 'honest work' with US to end Ukraine war 45 minutes ago Share Save Laura Gozzi and James Chater Share Save Russia advances in Uk...",
+    "insights": {
+      "authenticity_score": 86,
+      "credibility_rating": "High",
+      "is_reliable": true,
+      "reliability_status": "Reliable",
+      "authenticity_level": "HIGH",
+      "recommendation": "Credible news source",
+      "confidence": 0.85,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 95,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 1,
+          "quotes": 21,
+          "word_count": 980,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 90,
+          "bias_level": "OBJECTIVE",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 0,
+            "sensationalist": 0,
+            "objective": 1
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 38,
+        "cross_verification": 12,
+        "bias_analysis": 13.5
+      },
+      "analyzed_at": "2025-11-21T12:11:34.963228",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "Russia Ukraine War | Zelensky Says He Is Ready To Work On US Backed Plan To End War In Ukraine | 4K",
+        "url": "https://www.youtube.com/watch?v=9XdWxDa0kTY",
+        "thumbnail": "https://img.youtube.com/vi/9XdWxDa0kTY/mqdefault.jpg",
+        "duration": "Unknown",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2025-11-21T06:41:51.075Z"
+  },
+  {
+    "id": "scraped_1763534617793_26szz1xta",
+    "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
+    "description": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet 6 hours ago Share Save Jessica Parker, Berlin correspondent, Bal...",
+    "url": "https://www.bbc.com/news/articles/cz91dk0l50no",
+    "source": "Bbc",
+    "category": "general",
+    "imageUrl": "https://img.youtube.com/vi/vuaXEt6_c5o/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "10 min read",
+    "scrapedAt": "2025-11-19T06:43:37.793Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/news/articles/cz91dk0l50no",
+      "timestamp": "2025-11-19T12:13:06.724547",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 1.09,
+        "vetting": 0,
+        "summarization": 2.39,
+        "prompt_generation": 1.37,
+        "video_search": 26.22
+      },
+      "scraped_data": {
+        "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
+        "content_length": 9699,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 86,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 1,
+            "quotes": 31,
+            "word_count": 1575,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 90,
+            "bias_level": "OBJECTIVE",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 2
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 13.5
+        },
+        "analyzed_at": "2025-11-19T12:13:07.810624",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet 6 hours ago Share Save Jessica Parker, Berlin correspondent, Bal...",
+        "original_length": 9699,
+        "summary_length": 150,
+        "compression_ratio": 1.5
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: On the front line of Europe's standoff with Russia's sanction-busting shadow fleet with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "vuaXEt6_c5o",
+            "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
+            "description": "YouTube video about On the front line of Europe's standoff with Russia's sanction-busting shadow fleet news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/vuaXEt6_c5o/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "duration": "Unknown",
+            "views": "Unknown",
+            "published_at": "2025-11-19T12:13:33.276191",
+            "url": "https://www.youtube.com/watch?v=vuaXEt6_c5o",
+            "embed_url": "https://www.youtube.com/embed/vuaXEt6_c5o",
+            "relevance_score": 0.9,
+            "scraped": true,
+            "real_video": true
+          }
+        ],
+        "total_found": 1,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 31.07,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet 6 hours ago Share Save Jessica Parker, Berlin correspondent, Bal...",
+    "insights": {
+      "authenticity_score": 86,
+      "credibility_rating": "High",
+      "is_reliable": true,
+      "reliability_status": "Reliable",
+      "authenticity_level": "HIGH",
+      "recommendation": "Credible news source",
+      "confidence": 0.85,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 95,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 1,
+          "quotes": 31,
+          "word_count": 1575,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 90,
+          "bias_level": "OBJECTIVE",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 0,
+            "sensationalist": 0,
+            "objective": 2
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 38,
+        "cross_verification": 12,
+        "bias_analysis": 13.5
+      },
+      "analyzed_at": "2025-11-19T12:13:07.810624",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
+        "url": "https://www.youtube.com/watch?v=vuaXEt6_c5o",
+        "thumbnail": "https://img.youtube.com/vi/vuaXEt6_c5o/mqdefault.jpg",
+        "duration": "Unknown",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2025-11-19T06:43:38.058Z"
+  }
+]

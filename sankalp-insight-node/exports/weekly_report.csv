@@ -1,0 +1,11 @@
+id,title,category,language,polarity,tone,trend_score,priority_score,timestamp
+https://www.bbc.com/news/articles/c891zkwvjl2o#0,Ecuador votes against allowing foreign military bases in country,technology,en,positive,joyful,1.0,0.7,2025-11-17T02:59:09+00:00
+https://www.bbc.com/news/articles/cn8vm30rr78o#1,Thousands protest against government in Mexico as clashes leave 120 injured,technology,en,positive,joyful,1.0,0.7,2025-11-16T03:14:59+00:00
+https://www.bbc.com/news/articles/cwypzdgwg1yo#0,Brazil's Amazon rainforest at risk as key protection under threat,technology,en,negative,calm,1.0,0.58,2025-11-17T01:10:54+00:00
+https://www.bbc.com/news/articles/crexy0e2373o#0,Jurors in high-profile Australian trial visit beach where murder victim found,general,en,positive,joyful,0.06,0.324,2025-11-17T04:49:38+00:00
+https://www.bbc.com/news/articles/cvgv653v1vjo#0,Trump calls on House Republicans to vote to release Epstein files,general,en,neutral,calm,0.06,0.244,2025-11-17T07:57:07+00:00
+https://www.bbc.com/news/articles/clyk0nd1nq6o#1,Man arrested over deadly Delhi car bomb attack,general,en,neutral,calm,0.06,0.244,2025-11-16T16:16:05+00:00
+https://www.bbc.com/news/articles/c2emyz0zpxko#0,Two US marines implicated in killing family in notorious Iraq war shooting  expert tells BBC,general,en,neutral,calm,0.06,0.244,2025-11-17T00:16:13+00:00
+https://www.bbc.com/news/articles/c0jd0v8dvpwo#0,Communist and far-right candidates head to Chile presidential run-off,general,en,neutral,calm,0.06,0.244,2025-11-17T00:58:14+00:00
+https://www.bbc.com/news/articles/cqjw2x10njeo#1,Hackers steal maternity ward CCTV videos in India cybercrime racket,general,en,neutral,calm,0.06,0.244,2025-11-17T00:00:03+00:00
+https://www.bbc.com/news/articles/cqx3n4r2g04o#1,Federal agents launch immigration crackdown in city of Charlotte,general,en,neutral,calm,0.06,0.244,2025-11-16T18:10:10+00:00
