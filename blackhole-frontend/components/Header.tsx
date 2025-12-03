@@ -67,11 +67,10 @@ export default function Header({ backendStatus }: HeaderProps) {
               <Link
                 key={item.id}
                 href={item.href}
-                className={`transition-colors ${
-                  isActive(item.href)
+                className={`transition-colors ${isActive(item.href)
                     ? 'text-purple-400 font-medium'
                     : 'text-gray-300 hover:text-white'
-                }`}
+                  }`}
               >
                 {item.label}
               </Link>
@@ -96,11 +95,15 @@ export default function Header({ backendStatus }: HeaderProps) {
                 <Clock className="w-4 h-4" />
                 <span>921hrs</span>
               </div>
-              <div className="flex items-center space-x-1">
-                <Users className="w-4 h-4" />
-                <span>Active</span>
-              </div>
             </div>
+
+            {/* Login Button */}
+            <Link
+              href="/login"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
+            >
+              Login
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -120,17 +123,16 @@ export default function Header({ backendStatus }: HeaderProps) {
                 <Link
                   key={`mobile-${item.id}`}
                   href={item.href}
-                  className={`transition-colors ${
-                    isActive(item.href)
+                  className={`transition-colors ${isActive(item.href)
                       ? 'text-purple-400 font-medium'
                       : 'text-gray-300 hover:text-white'
-                  }`}
+                    }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
                 </Link>
               ))}
-              
+
               {/* Mobile Status */}
               <div className="flex items-center space-x-2 pt-4 border-t border-white/10">
                 <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>

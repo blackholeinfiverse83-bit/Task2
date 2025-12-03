@@ -1,5 +1,345 @@
 [
   {
+    "id": "scraped_1764741025703_xxfmdcfe4",
+    "title": "Airbus to inspect some planes over 'quality issue' with panels",
+    "description": "Airbus to inspect some planes over 'quality issue' with panels 3 hours ago Share Save Josh Martin and Osmond Chia Share Save Getty Images The Airbu...",
+    "url": "https://www.bbc.com/news/articles/c3v19q3r31ro",
+    "source": "Bbc",
+    "category": "general",
+    "imageUrl": "https://img.youtube.com/vi/DObv0G-Kf6g/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "3 min read",
+    "scrapedAt": "2025-12-03T05:50:25.703Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/news/articles/c3v19q3r31ro",
+      "timestamp": "2025-12-03T11:20:09.958097",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 0.39,
+        "vetting": 0,
+        "summarization": 0.61,
+        "prompt_generation": 0.23,
+        "video_search": 14.51
+      },
+      "scraped_data": {
+        "title": "Airbus to inspect some planes over 'quality issue' with panels",
+        "content_length": 2458,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 81.5,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 6,
+            "word_count": 396,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 60,
+            "bias_level": "MODERATE_BIAS",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 1,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 9
+        },
+        "analyzed_at": "2025-12-03T11:20:10.352254",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "Airbus to inspect some planes over 'quality issue' with panels 3 hours ago Share Save Josh Martin and Osmond Chia Share Save Getty Images The Airbu...",
+        "original_length": 2458,
+        "summary_length": 150,
+        "compression_ratio": 6.1
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: Airbus to inspect some planes over 'quality issue' with panels with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "DObv0G-Kf6g",
+            "title": "Airbus to Inspect Hundreds of A320 Jets for Defective Panels",
+            "description": "YouTube video about Airbus to inspect some planes over 'quality issue' with panels news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/DObv0G-Kf6g/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "duration": "Unknown",
+            "views": "Unknown",
+            "published_at": "2025-12-03T11:20:23.584844",
+            "url": "https://www.youtube.com/watch?v=DObv0G-Kf6g",
+            "embed_url": "https://www.youtube.com/embed/DObv0G-Kf6g",
+            "relevance_score": 0.9,
+            "scraped": true,
+            "real_video": true
+          }
+        ],
+        "total_found": 1,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 15.74,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "Airbus to inspect some planes over 'quality issue' with panels 3 hours ago Share Save Josh Martin and Osmond Chia Share Save Getty Images The Airbu...",
+    "insights": {
+      "authenticity_score": 81.5,
+      "credibility_rating": "High",
+      "is_reliable": true,
+      "reliability_status": "Reliable",
+      "authenticity_level": "HIGH",
+      "recommendation": "Credible news source",
+      "confidence": 0.85,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 95,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 0,
+          "quotes": 6,
+          "word_count": 396,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 60,
+          "bias_level": "MODERATE_BIAS",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 1,
+            "sensationalist": 0,
+            "objective": 0
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 38,
+        "cross_verification": 12,
+        "bias_analysis": 9
+      },
+      "analyzed_at": "2025-12-03T11:20:10.352254",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "Airbus to Inspect Hundreds of A320 Jets for Defective Panels",
+        "url": "https://www.youtube.com/watch?v=DObv0G-Kf6g",
+        "thumbnail": "https://img.youtube.com/vi/DObv0G-Kf6g/mqdefault.jpg",
+        "duration": "Unknown",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2025-12-03T05:50:25.723Z"
+  },
+  {
+    "id": "scraped_1764740458923_l29hw9d6v",
+    "title": "'Carspreading' is on the rise - and not everyone is happy about it",
+    "description": "'Carspreading' is on the rise - and not everyone is happy about it 5 hours ago Share Save Theo Leggett International Business Correspondent Share S...",
+    "url": "https://www.bbc.com/news/articles/cy7vdvl2531o",
+    "source": "Bbc",
+    "category": "business",
+    "imageUrl": "https://img.youtube.com/vi/7rFxp5bvVAk/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "14 min read",
+    "scrapedAt": "2025-12-03T05:40:58.923Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/news/articles/cy7vdvl2531o",
+      "timestamp": "2025-12-03T11:10:48.056498",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 0.6,
+        "vetting": 0.01,
+        "summarization": 0.64,
+        "prompt_generation": 0.23,
+        "video_search": 9.4
+      },
+      "scraped_data": {
+        "title": "'Carspreading' is on the rise - and not everyone is happy about it",
+        "content_length": 13461,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 86,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 1,
+            "quotes": 26,
+            "word_count": 2245,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 90,
+            "bias_level": "OBJECTIVE",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 1,
+              "sensationalist": 0,
+              "objective": 1
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 13.5
+        },
+        "analyzed_at": "2025-12-03T11:10:48.654329",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "'Carspreading' is on the rise - and not everyone is happy about it 5 hours ago Share Save Theo Leggett International Business Correspondent Share S...",
+        "original_length": 13461,
+        "summary_length": 150,
+        "compression_ratio": 1.1
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: 'Carspreading' is on the rise - and not everyone is happy about it with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "7rFxp5bvVAk",
+            "title": "AI Is Reshaping Consulting: Why Top Firms Are Freezing Salaries | Vantage with Palki Sharma | N18G",
+            "description": "YouTube video about 'Carspreading' is on the rise - and not everyone is happy about it news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/7rFxp5bvVAk/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "duration": "Unknown",
+            "views": "Unknown",
+            "published_at": "2025-12-03T11:10:56.434582",
+            "url": "https://www.youtube.com/watch?v=7rFxp5bvVAk",
+            "embed_url": "https://www.youtube.com/embed/7rFxp5bvVAk",
+            "relevance_score": 0.9,
+            "scraped": true,
+            "real_video": true
+          }
+        ],
+        "total_found": 1,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 10.88,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "'Carspreading' is on the rise - and not everyone is happy about it 5 hours ago Share Save Theo Leggett International Business Correspondent Share S...",
+    "insights": {
+      "authenticity_score": 86,
+      "credibility_rating": "High",
+      "is_reliable": true,
+      "reliability_status": "Reliable",
+      "authenticity_level": "HIGH",
+      "recommendation": "Credible news source",
+      "confidence": 0.85,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 95,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 1,
+          "quotes": 26,
+          "word_count": 2245,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 90,
+          "bias_level": "OBJECTIVE",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 1,
+            "sensationalist": 0,
+            "objective": 1
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 38,
+        "cross_verification": 12,
+        "bias_analysis": 13.5
+      },
+      "analyzed_at": "2025-12-03T11:10:48.654329",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "AI Is Reshaping Consulting: Why Top Firms Are Freezing Salaries | Vantage with Palki Sharma | N18G",
+        "url": "https://www.youtube.com/watch?v=7rFxp5bvVAk",
+        "thumbnail": "https://img.youtube.com/vi/7rFxp5bvVAk/mqdefault.jpg",
+        "duration": "Unknown",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2025-12-03T05:40:58.935Z"
+  },
+  {
     "id": "scraped_1764572537497_iz57mqb03",
     "title": "BBC Sport",
     "description": "'Qatar GP shows anything can happen in three-way title showdown' Formula 1 is heading into its first final-race championship showdown between more ...",

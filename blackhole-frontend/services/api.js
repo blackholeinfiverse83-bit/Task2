@@ -4,6 +4,8 @@
  * Compatible with existing backend endpoints
  */
 
+import { buildSecureHeaders } from '../lib/security'
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 // Check if real backend is available
@@ -242,32 +244,44 @@ class APIService {
     // Always try real backend first unless explicitly set to mock
     if (!this.useMockData || !this.backendChecked) {
       try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const url = `${API_BASE_URL}${endpoint}`
+        const method = options.method || 'GET'
+        
+        // Build security headers
+        const secureHeaders = await buildSecureHeaders(url, method, options.body ? JSON.parse(options.body) : null)
+        
+        const response = await fetch(url, {
           ...options,
           headers: {
             'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'true',
+            ...secureHeaders,
             ...options.headers,
           },
-        });
+        })
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Check for auth errors
+          if (response.status === 401 || response.status === 403) {
+            console.error('Authentication error:', response.status)
+            throw new Error(`Authentication failed: ${response.status}`)
+          }
+          throw new Error(`HTTP error! status: ${response.status}`)
         }
 
-        const data = await response.json();
-        backendAvailable = true;
-        return data;
+        const data = await response.json()
+        backendAvailable = true
+        return data
       } catch (error) {
-        console.warn(`API call to ${endpoint} failed, using mock data: ${error.message}`);
-        backendAvailable = false;
-        this.useMockData = true;
-        return this.getMockResponse(endpoint);
+        console.warn(`API call to ${endpoint} failed, using mock data: ${error.message}`)
+        backendAvailable = false
+        this.useMockData = true
+        return this.getMockResponse(endpoint)
       }
     }
     
     // Use mock data
-    return this.getMockResponse(endpoint);
+    return this.getMockResponse(endpoint)
   }
 
   /**

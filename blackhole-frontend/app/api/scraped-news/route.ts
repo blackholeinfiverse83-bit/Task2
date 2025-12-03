@@ -3,32 +3,35 @@ import { promises as fs } from 'fs'
 import path from 'path'
 
 const DATA_DIR = path.join(process.cwd(), 'data')
-const DATA_FILE = path.join(DATA_DIR, 'scraped-news.json')
+const DATA_FILE = path.join(process.cwd(), '..', 'sankalp-insight-node', 'exports', 'sample_integration.json')
 const MAX_ARTICLES = 100
 
 async function ensureDataFile() {
-  await fs.mkdir(DATA_DIR, { recursive: true })
+  // For the backend export, we assume it exists or we don't create it to avoid messing up backend state
+  // If it doesn't exist, we'll just return empty
   try {
     await fs.access(DATA_FILE)
   } catch {
-    await fs.writeFile(DATA_FILE, '[]', 'utf-8')
+    // If file doesn't exist, we might want to create it or just warn
+    // For now, let's not auto-create a backend file from frontend
   }
 }
 
 async function readArticles() {
-  await ensureDataFile()
-  const raw = await fs.readFile(DATA_FILE, 'utf-8')
   try {
-    const parsed = JSON.parse(raw || '[]')
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
+    const raw = await fs.readFile(DATA_FILE, 'utf-8')
+    const parsed = JSON.parse(raw || '{}')
+    return Array.isArray(parsed.items) ? parsed.items : []
+  } catch (error) {
+    console.warn('Failed to read articles from backend export:', error)
     return []
   }
 }
 
 async function writeArticles(articles: unknown[]) {
+  // We'll preserve the structure { items: [...] }
   await ensureDataFile()
-  await fs.writeFile(DATA_FILE, JSON.stringify(articles, null, 2), 'utf-8')
+  await fs.writeFile(DATA_FILE, JSON.stringify({ items: articles }, null, 2), 'utf-8')
 }
 
 export async function GET() {

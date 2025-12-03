@@ -110,12 +110,12 @@ export async function testIndividualTool(tool: string, payload: any): Promise<an
       video: '/api/video-search',
       'validate-video': '/api/validate-video'
     }
-    
+
     const endpoint = endpoints[tool]
     if (!endpoint) {
       throw new Error(`Unknown tool: ${tool}`)
     }
-    
+
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -123,11 +123,11 @@ export async function testIndividualTool(tool: string, payload: any): Promise<an
       },
       body: JSON.stringify(payload),
     })
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     return await response.json()
   } catch (error) {
     console.error(`${tool} tool test failed:`, error)
@@ -155,6 +155,8 @@ export async function getBackendStatus(): Promise<{
 // ============================================================================
 // Sankalp (Insight Node) API Integration
 // ============================================================================
+
+import { buildSecureHeaders } from './security'
 
 export interface SankalpItem {
   id: string
@@ -202,28 +204,36 @@ export interface FeedbackResponse {
  */
 export async function getSankalpFeed(): Promise<SankalpFeedResponse> {
   try {
+    const url = `${SANKALP_API_BASE}/exports/weekly_report.json`
+    const secureHeaders = await buildSecureHeaders(url, 'GET')
+
     // Try to fetch from weekly_report.json endpoint
     // If Sankalp doesn't expose this, we'll need to adjust
-    const response = await fetch(`${SANKALP_API_BASE}/exports/weekly_report.json`, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        ...secureHeaders,
       },
     })
 
     if (!response.ok) {
       // Fallback: try sample_integration.json
-      const fallbackResponse = await fetch(`${SANKALP_API_BASE}/exports/sample_integration.json`, {
+      const fallbackUrl = `${SANKALP_API_BASE}/exports/sample_integration.json`
+      const fallbackHeaders = await buildSecureHeaders(fallbackUrl, 'GET')
+
+      const fallbackResponse = await fetch(fallbackUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          ...fallbackHeaders,
         },
       })
-      
+
       if (!fallbackResponse.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      
+
       const data = await fallbackResponse.json()
       return { items: data.items || [] }
     }
@@ -246,16 +256,21 @@ export async function submitFeedback(
   signals: FeedbackSignals
 ): Promise<FeedbackResponse> {
   try {
-    const response = await fetch(`${SANKALP_API_BASE}/feedback`, {
+    const url = `${SANKALP_API_BASE}/feedback`
+    const body = {
+      id: itemId,
+      item: item,
+      signals: signals,
+    }
+    const secureHeaders = await buildSecureHeaders(url, 'POST', body)
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...secureHeaders,
       },
-      body: JSON.stringify({
-        id: itemId,
-        item: item,
-        signals: signals,
-      }),
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
@@ -275,14 +290,17 @@ export async function submitFeedback(
  */
 export async function requeueItem(itemId: string): Promise<{ id: string; requeued: boolean }> {
   try {
-    const response = await fetch(`${SANKALP_API_BASE}/requeue`, {
+    const url = `${SANKALP_API_BASE}/requeue`
+    const body = { id: itemId }
+    const secureHeaders = await buildSecureHeaders(url, 'POST', body)
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...secureHeaders,
       },
-      body: JSON.stringify({
-        id: itemId,
-      }),
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
@@ -302,18 +320,18 @@ export async function requeueItem(itemId: string): Promise<{ id: string; requeue
  */
 export function getAudioUrl(audioPath: string): string {
   if (!audioPath) return ''
-  
+
   // If it's already a full URL, return as is
   if (audioPath.startsWith('http://') || audioPath.startsWith('https://')) {
     return audioPath
   }
-  
+
   // Otherwise, construct URL from base and path
   const audioBase = process.env.NEXT_PUBLIC_AUDIO_BASE_URL || SANKALP_API_BASE
   // Normalize path (replace backslashes with forward slashes)
   const normalizedPath = audioPath.replace(/\\/g, '/')
   // Remove leading slash if present to avoid double slashes
   const cleanPath = normalizedPath.startsWith('/') ? normalizedPath.slice(1) : normalizedPath
-  
+
   return `${audioBase}/${cleanPath}`
 }

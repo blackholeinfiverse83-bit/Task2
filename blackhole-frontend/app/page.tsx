@@ -59,7 +59,7 @@ interface AnalysisResults {
 export default function Home() {
   const searchParams = useSearchParams()
   const urlParam = searchParams.get('url')
-  
+
   const [backendStatus, setBackendStatus] = useState<'online' | 'offline' | 'checking'>('checking')
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -78,13 +78,13 @@ export default function Home() {
     checkBackend()
     loadFeedVideos()
     const interval = setInterval(checkBackend, 30000) // Check every 30 seconds
-    
+
     // Listen for new articles being saved
     const handleNewsSaved = () => {
       loadFeedVideos()
     }
     window.addEventListener('newsArticleSaved', handleNewsSaved)
-    
+
     return () => {
       clearInterval(interval)
       window.removeEventListener('newsArticleSaved', handleNewsSaved)
@@ -101,7 +101,7 @@ export default function Home() {
         duration?: string
         source: string
       }> = []
-      
+
       savedNews.forEach(article => {
         if (article.relatedVideos && Array.isArray(article.relatedVideos)) {
           article.relatedVideos.forEach(video => {
@@ -119,19 +119,19 @@ export default function Home() {
                   videoUrl = `https://www.youtube.com/embed/${videoId}`
                 }
               }
-              
+
               allVideos.push({
-                title: video.title,
+                title: typeof video.title === 'string' ? video.title : 'Related Video',
                 url: videoUrl,
                 thumbnail: video.thumbnail,
                 duration: video.duration,
-                source: video.source || 'YouTube'
+                source: typeof video.source === 'string' ? video.source : 'YouTube'
               })
             }
           })
         }
       })
-      
+
       setFeedVideos(allVideos)
     } catch (error) {
       console.error('Error loading feed videos:', error)
@@ -162,14 +162,14 @@ export default function Home() {
     setAnalysisResults(results)
     setIsAnalyzing(false)
     setCurrentStep(0)
-    
+
     // Extract URL from results if analyzedUrl is not set - check multiple locations
-    const articleUrl = analyzedUrl || 
-                       results?.url || 
-                       results?.scraped_data?.url ||
-                       (results as any)?.scraped_content?.url ||
-                       ''
-    
+    const articleUrl = analyzedUrl ||
+      results?.url ||
+      results?.scraped_data?.url ||
+      (results as any)?.scraped_content?.url ||
+      ''
+
     console.log('🔍 URL extraction:', {
       analyzedUrl,
       resultsUrl: results?.url,
@@ -177,7 +177,7 @@ export default function Home() {
       finalArticleUrl: articleUrl,
       hasArticleUrl: !!articleUrl
     })
-    
+
     // Save scraped news to localStorage for the feed
     if (results && articleUrl && articleUrl.trim() !== '') {
       try {
@@ -186,7 +186,7 @@ export default function Home() {
           hasResults: !!results,
           resultsStructure: Object.keys(results)
         })
-        
+
         const saved = saveScrapedNews(results, articleUrl)
         if (saved) {
           console.log('✅ News article saved to feed:', saved.title, {
@@ -201,10 +201,10 @@ export default function Home() {
           setTimeout(() => setShowSavedNotification(false), 5000)
           // Refresh feed videos
           loadFeedVideos()
-          
+
           // Force refresh the feed page if it's open
           window.dispatchEvent(new CustomEvent('newsArticleSaved', { detail: saved }))
-          
+
           // Also trigger a storage event for cross-tab sync
           if (typeof window !== 'undefined' && window.localStorage) {
             window.localStorage.setItem('newsFeedUpdated', Date.now().toString())
@@ -227,7 +227,7 @@ export default function Home() {
         resultsUrl: results?.url,
         scrapedDataUrl: results?.scraped_data?.url
       })
-      
+
       // Try to save anyway if we have results, even without URL (use a fallback)
       if (results) {
         const fallbackUrl = results?.url || `scraped-${Date.now()}`
@@ -320,7 +320,7 @@ export default function Home() {
                     <div className="text-3xl mb-4">⚠️</div>
                     <h3 className="text-lg font-semibold text-white mb-2">Authenticity Vetting</h3>
                     <p className="text-gray-300 text-sm">
-                      Enhanced AI-powered credibility analysis with bias detection, source verification, and 
+                      Enhanced AI-powered credibility analysis with bias detection, source verification, and
                       intelligent content type detection (articles vs listing pages).
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1 justify-center">
@@ -351,16 +351,16 @@ export default function Home() {
           {/* Video Sidebar */}
           <div className="xl:col-span-1">
             <VideoPlayer
-              videos={analysisResults 
-                ? (analysisResults?.sidebar_videos?.videos || []).filter(video => 
-                    video && video.title && video.source
-                  ).map(video => ({
-                    title: video.title!,
-                    url: video.url || '',
-                    thumbnail: video.thumbnail,
-                    duration: video.duration,
-                    source: video.source!
-                  }))
+              videos={analysisResults
+                ? (analysisResults?.sidebar_videos?.videos || []).filter(video =>
+                  video && video.title && video.source
+                ).map(video => ({
+                  title: video.title!,
+                  url: video.url || '',
+                  thumbnail: video.thumbnail,
+                  duration: video.duration,
+                  source: video.source!
+                }))
                 : feedVideos
               }
               title={analysisResults ? "Related Videos" : feedVideos.length > 0 ? "News Feed Videos" : "Demo Videos"}

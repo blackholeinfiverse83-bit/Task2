@@ -39,7 +39,7 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
       url: url,
       scrapedDataKeys: scrapedData ? Object.keys(scrapedData) : []
     })
-    
+
     if (!scrapedData || !url) {
       console.warn('⚠️ saveScrapedNews: Missing required data', {
         hasScrapedData: !!scrapedData,
@@ -49,39 +49,38 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
     }
 
     // Extract information from scraped data (handle multiple response structures)
-    const title = scrapedData.title || 
-                  scrapedData.scraped_data?.title || 
-                  scrapedData.scraped_content?.title ||
-                  'Untitled Article'
-    
-    const description = scrapedData.summary?.text || 
-                       scrapedData.summary || 
-                       scrapedData.scraped_data?.content?.substring(0, 200) ||
-                       scrapedData.scraped_content?.summary ||
-                       scrapedData.scraped_content?.content?.substring(0, 200) ||
-                       'No description available'
-    
+    const title = scrapedData.title ||
+      scrapedData.scraped_data?.title ||
+      scrapedData.scraped_content?.title ||
+      'Untitled Article'
+
+    const description = (typeof scrapedData.summary === 'string' ? scrapedData.summary : scrapedData.summary?.text) ||
+      scrapedData.scraped_data?.content?.substring(0, 200) ||
+      scrapedData.scraped_content?.summary ||
+      scrapedData.scraped_content?.content?.substring(0, 200) ||
+      'No description available'
+
     const source = extractSourceFromUrl(url)
     const category = detectCategory(title, description)
-    const author = scrapedData.scraped_data?.author || 
-                   scrapedData.scraped_content?.author || 
-                   source
-    const date = scrapedData.scraped_data?.date || 
-                 scrapedData.scraped_content?.publication_date ||
-                 scrapedData.scraped_content?.date ||
-                 new Date().toISOString()
-    
+    const author = scrapedData.scraped_data?.author ||
+      scrapedData.scraped_content?.author ||
+      source
+    const date = scrapedData.scraped_data?.date ||
+      scrapedData.scraped_content?.publication_date ||
+      scrapedData.scraped_content?.date ||
+      new Date().toISOString()
+
     // Calculate read time based on content length
-    const contentLength = scrapedData.scraped_data?.content_length || 
-                         scrapedData.scraped_content?.word_count ||
-                         (scrapedData.scraped_data?.content?.length || 0) ||
-                         (scrapedData.scraped_content?.content?.length || 0) ||
-                         description.length
+    const contentLength = scrapedData.scraped_data?.content_length ||
+      scrapedData.scraped_content?.word_count ||
+      (scrapedData.scraped_data?.content?.length || 0) ||
+      (scrapedData.scraped_content?.content?.length || 0) ||
+      description.length
     const readTime = Math.ceil(contentLength / 1000) + ' min read'
 
     const imageUrl = findBestImage(scrapedData, title)
     const relatedVideos = extractRelatedVideos(scrapedData)
-    
+
     console.log('📝 Extracting article data:', {
       title,
       category,
@@ -104,14 +103,14 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
       readTime: readTime,
       scrapedAt: new Date().toISOString(),
       scrapedData: scrapedData,
-      summary: typeof scrapedData.summary === 'string' ? scrapedData.summary : scrapedData.summary?.text,
+      summary: typeof scrapedData.summary === 'string' ? scrapedData.summary : (scrapedData.summary?.text || ''),
       insights: scrapedData.vetting_results || scrapedData.insights,
       relatedVideos
     }
 
     // Get existing articles
     const existing = getSavedNews()
-    
+
     // Check if article with same URL already exists
     const existingIndex = existing.findIndex(item => item.url === url)
     if (existingIndex >= 0) {
@@ -124,7 +123,7 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
 
     // Keep only the most recent articles
     const limited = existing.slice(0, MAX_SAVED_ARTICLES)
-    
+
     // Save to localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(limited))
     console.log('💾 Article saved to localStorage:', {
@@ -133,7 +132,7 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
       totalArticles: limited.length,
       storageKey: STORAGE_KEY
     })
-    
+
     // Dispatch custom event to notify feed of new article
     if (typeof window !== 'undefined') {
       const event = new CustomEvent('newsArticleSaved', { detail: newsItem })
@@ -149,7 +148,7 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
         body: JSON.stringify(newsItem)
       }).catch(error => console.error('Failed to sync scraped news to server:', error))
     }
-    
+
     return newsItem
   } catch (error) {
     console.error('Error saving scraped news:', error)
@@ -164,7 +163,7 @@ export function getSavedNews(): SavedNewsItem[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
-    
+
     const articles = JSON.parse(stored)
     return Array.isArray(articles) ? articles : []
   } catch (error) {
@@ -217,7 +216,7 @@ function extractSourceFromUrl(url: string): string {
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
-    
+
     return source || 'Unknown Source'
   } catch {
     return 'Unknown Source'
@@ -229,7 +228,7 @@ function extractSourceFromUrl(url: string): string {
  */
 function detectCategory(title: string, description: string): string {
   const text = (title + ' ' + description).toLowerCase()
-  
+
   if (text.match(/\b(tech|ai|software|computer|digital|internet|cyber|code|programming)\b/)) {
     return 'technology'
   }
@@ -251,7 +250,7 @@ function detectCategory(title: string, description: string): string {
   if (text.match(/\b(education|school|university|student|learn|teach)\b/)) {
     return 'education'
   }
-  
+
   return 'general'
 }
 
@@ -263,12 +262,12 @@ function formatTimeAgo(timestamp: string): string {
     const date = new Date(timestamp)
     const now = new Date()
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
+
     if (seconds < 60) return 'Just now'
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`
     if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`
-    
+
     return date.toLocaleDateString()
   } catch {
     return 'Recently'
@@ -285,23 +284,23 @@ function findBestImage(scrapedData: any, title: string): string | undefined {
     scrapedData.scraped_data?.metadata?.twitterImage,
     scrapedData.scraped_data?.metadata?.og_image,
     scrapedData.scraped_data?.metadata?.twitter_image,
-    
+
     // Direct from scraped_data root (if structure is flat)
     scrapedData.images?.[0]?.url,
     scrapedData.metadata?.image,
     scrapedData.metadata?.ogImage,
     scrapedData.metadata?.twitterImage,
-    
+
     // From main article structure (unified-news-workflow response)
     scrapedData.scraped_content?.images?.[0]?.url,
     scrapedData.scraped_content?.metadata?.image,
     scrapedData.scraped_content?.metadata?.ogImage,
-    
+
     // Video thumbnails as fallback
     scrapedData.sidebar_videos?.videos?.[0]?.thumbnail,
     scrapedData.ai_video_generation?.video_data?.thumbnail,
   ]
-  
+
   // Filter out invalid URLs
   const validCandidates = candidates.filter(url => {
     if (!url || typeof url !== 'string') return false
@@ -313,7 +312,7 @@ function findBestImage(scrapedData: any, title: string): string | undefined {
       return false
     }
   })
-  
+
   const selected = validCandidates[0]
   if (selected) return selected
 

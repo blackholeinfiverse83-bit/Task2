@@ -50,20 +50,20 @@ export default function NewsFeed() {
     checkBackend()
     loadNewsFeed()
     const interval = setInterval(checkBackend, 30000)
-    
+
     // Listen for storage changes to refresh feed when new articles are added
     const handleStorageChange = () => {
       loadNewsFeed()
     }
     window.addEventListener('storage', handleStorageChange)
-    
+
     // Listen for custom event when articles are saved in same tab
     const handleNewsSaved = (event?: CustomEvent) => {
       console.log('📰 News article saved event received:', event?.detail)
       loadNewsFeed()
     }
     window.addEventListener('newsArticleSaved', handleNewsSaved as EventListener)
-    
+
     // Also listen for localStorage changes
     const handleStorageUpdate = () => {
       if (localStorage.getItem('newsFeedUpdated')) {
@@ -73,12 +73,12 @@ export default function NewsFeed() {
       }
     }
     window.addEventListener('storage', handleStorageUpdate)
-    
+
     // Also check periodically for changes (in case same tab adds articles)
     const refreshInterval = setInterval(() => {
       loadNewsFeed()
     }, 3000)
-    
+
     return () => {
       clearInterval(interval)
       clearInterval(refreshInterval)
@@ -103,24 +103,30 @@ export default function NewsFeed() {
     try {
       console.log('📰 Loading from Sankalp...')
       const sankalpFeed = await getSankalpFeed()
-      sankalpItems = sankalpFeed.items.map((item: SankalpItem) => ({
-        id: item.id,
-        title: item.title || item.script?.substring(0, 100) || 'Untitled',
-        description: item.script || item.summary_medium || item.summary_short || '',
-        url: item.id, // Use id as URL since it's URL-based
-        source: extractSourceFromUrl(item.id),
-        category: item.category || 'general',
-        publishedAt: item.timestamp ? formatTimeAgo(item.timestamp) : 'Recently',
-        readTime: item.audio_duration ? `${Math.ceil(item.audio_duration)}s audio` : undefined,
-        // Sankalp fields
-        script: item.script,
-        tone: item.tone,
-        audio_path: item.audio_path,
-        priority_score: item.priority_score,
-        trend_score: item.trend_score,
-        audio_duration: item.audio_duration,
-        isScraped: false // Mark as from Sankalp
-      }))
+      sankalpItems = sankalpFeed.items.map((item: SankalpItem) => {
+        const newsItem = {
+          id: item.id || `item-${Date.now()}-${Math.random()}`,
+          title: typeof item.title === 'string' ? item.title : (typeof item.script === 'string' ? item.script.substring(0, 100) : 'Untitled'),
+          description: typeof item.script === 'string' ? item.script : (item.summary_medium || item.summary_short || ''),
+          url: item.id || '', // Use id as URL since it's URL-based
+          source: extractSourceFromUrl(item.id || ''),
+          category: item.category || 'general',
+          publishedAt: item.timestamp ? formatTimeAgo(item.timestamp) : 'Recently',
+          readTime: item.audio_duration ? `${Math.ceil(item.audio_duration)}s audio` : undefined,
+          // Sankalp fields
+          script: typeof item.script === 'string' ? item.script : '',
+          tone: typeof item.tone === 'string' ? item.tone : '',
+          audio_path: typeof item.audio_path === 'string' ? item.audio_path : '',
+          priority_score: typeof item.priority_score === 'number' ? item.priority_score : 0,
+          trend_score: typeof item.trend_score === 'number' ? item.trend_score : 0,
+          audio_duration: typeof item.audio_duration === 'number' ? item.audio_duration : 0,
+          isScraped: false // Mark as from Sankalp
+        }
+        // Final safety check - ensure title and description are strings
+        if (typeof newsItem.title !== 'string') newsItem.title = 'Untitled'
+        if (typeof newsItem.description !== 'string') newsItem.description = ''
+        return newsItem
+      })
       console.log('✅ Sankalp feed loaded:', sankalpItems.length, 'items')
     } catch (error) {
       console.warn('⚠️ Failed to load Sankalp feed:', error)
@@ -149,7 +155,7 @@ export default function NewsFeed() {
     // Merge: Sankalp items first (highest priority), then scraped
     const scrapedNews = mergeByUrl([...serverScraped, ...localScraped])
     const allNews = mergeByUrl([...sankalpItems, ...scrapedNews])
-    
+
     console.log('📰 Total news loaded:', {
       sankalpCount: sankalpItems.length,
       scrapedCount: scrapedNews.length,
@@ -291,10 +297,24 @@ export default function NewsFeed() {
         readTime: '6 min read'
       }
     ]
-    
+
+
     // If we have Sankalp items or scraped items, use them; otherwise use sample news as fallback
     const finalNews = allNews.length > 0 ? allNews : sampleNews
-    setNewsItems(finalNews)
+
+    // CRITICAL: Sanitize all items to ensure they have valid title and description
+    const sanitizedNews = finalNews.map(item => ({
+      ...item,
+      id: item.id || `item-${Date.now()}-${Math.random()}`,
+      title: String(item.title || 'Untitled'),
+      description: String(item.description || ''),
+      url: String(item.url || item.id || ''),
+      category: String(item.category || 'general'),
+      source: String(item.source || 'Unknown'),
+      publishedAt: String(item.publishedAt || 'Recently'),
+    }))
+
+    setNewsItems(sanitizedNews)
   }
 
   const categories = [
@@ -309,9 +329,14 @@ export default function NewsFeed() {
   ]
 
   const filteredNews = newsItems.filter(item => {
+    // Safety check: ensure item has required properties
+    if (!item || typeof item !== 'object') return false
+
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const title = String(item.title || '')
+    const description = String(item.description || '')
+    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      description.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
@@ -333,7 +358,7 @@ export default function NewsFeed() {
     if (confirm('Remove this article from your feed?')) {
       const updated = newsItems.filter(item => item.id !== id)
       setNewsItems(updated)
-      
+
       // Also remove from localStorage if it's a scraped article
       if (newsItems.find(item => item.id === id)?.isScraped) {
         removeSavedNews(id)
@@ -364,6 +389,19 @@ export default function NewsFeed() {
           <p className="text-gray-400 text-lg">
             Browse the latest news from trusted sources worldwide. Scraped articles appear first. Click any article to analyze it with AI.
           </p>
+          <div className="mt-4">
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to clear all saved news data? This cannot be undone.')) {
+                  localStorage.removeItem('scraped_news_articles')
+                  window.location.reload()
+                }
+              }}
+              className="text-xs text-red-400 hover:text-red-300 underline"
+            >
+              Clear Saved Data (Fix Errors)
+            </button>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -387,11 +425,10 @@ export default function NewsFeed() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                  selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                    : 'bg-black/40 text-gray-300 hover:bg-black/60 border border-white/10'
-                }`}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${selectedCategory === category.id
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                  : 'bg-black/40 text-gray-300 hover:bg-black/60 border border-white/10'
+                  }`}
               >
                 <category.icon className="w-4 h-4" />
                 <span>{category.name}</span>
@@ -688,30 +725,40 @@ function formatTimeAgo(timestamp: string): string {
     const date = new Date(timestamp)
     const now = new Date()
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
+
     if (seconds < 60) return 'Just now'
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`
     if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`
-    
+
     return date.toLocaleDateString()
   } catch {
     return 'Recently'
   }
 }
 
-function mapSavedItemsToNews(items: SavedNewsItem[]): NewsItem[] {
+function mapSavedItemsToNews(items: any[]): NewsItem[] {
   return items.map(item => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    url: item.url,
-    source: item.source,
-    category: item.category,
+    id: item.id || `item-${Date.now()}-${Math.random()}`,
+    title: typeof item.title === 'string' ? item.title : (item.script?.substring(0, 100) || 'Untitled'),
+    description: typeof item.script === 'string' ? item.script :
+      (typeof item.description === 'string' ? item.description :
+        (typeof item.description === 'object' && (item.description as any)?.text) ? (item.description as any).text :
+          'No description available'),
+    url: String(item.url || item.id || ''), // Use id as URL fallback, ensure it's a string
+    source: typeof item.source === 'string' ? item.source : extractSourceFromUrl(String(item.id || '')),
+    category: typeof item.category === 'string' ? item.category : 'general',
     imageUrl: item.imageUrl,
-    publishedAt: item.publishedAt,
-    readTime: item.readTime,
+    publishedAt: typeof item.publishedAt === 'string' ? item.publishedAt : 'Recently',
+    readTime: item.audio_duration ? `${Math.ceil(item.audio_duration)}s audio` : (typeof item.readTime === 'string' ? item.readTime : undefined),
     isScraped: true,
+    // Sankalp fields
+    script: typeof item.script === 'string' ? item.script : '',
+    tone: typeof item.tone === 'string' ? item.tone : '',
+    audio_path: typeof item.audio_path === 'string' ? item.audio_path : '',
+    priority_score: typeof item.priority_score === 'number' ? item.priority_score : 0,
+    trend_score: typeof item.trend_score === 'number' ? item.trend_score : 0,
+    audio_duration: typeof item.audio_duration === 'number' ? item.audio_duration : 0,
     relatedVideos: item.relatedVideos
   }))
 }

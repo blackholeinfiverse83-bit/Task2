@@ -1,13 +1,183 @@
 {
   "items": [
     {
+      "id": "scraped_1764743839750_mhdca33bl",
+      "title": "Kremlin signals no Ukraine breakthrough after Putin talks with US",
+      "description": "Kremlin signals no Ukraine breakthrough after Putin talks with US 5 hours ago Share Save Maia Davies and Laura Gozzi Share Save EPA Five hours of t...",
+      "url": "https://www.bbc.com/news/articles/cwyv0ex7v8ro",
+      "source": "Bbc",
+      "category": "general",
+      "imageUrl": "https://img.youtube.com/vi/CjAYux42b2k/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "7 min read",
+      "scrapedAt": "2025-12-03T06:37:19.750Z",
+      "scrapedData": {
+        "url": "https://www.bbc.com/news/articles/cwyv0ex7v8ro",
+        "timestamp": "2025-12-03T12:07:04.506304",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 0.52,
+          "vetting": 0,
+          "summarization": 0.61,
+          "prompt_generation": 0.24,
+          "video_search": 13.87
+        },
+        "scraped_data": {
+          "title": "Kremlin signals no Ukraine breakthrough after Putin talks with US",
+          "content_length": 6526,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 86,
+          "credibility_rating": "High",
+          "is_reliable": true,
+          "reliability_status": "Reliable",
+          "authenticity_level": "HIGH",
+          "recommendation": "Credible news source",
+          "confidence": 0.85,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 95,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 1,
+              "quotes": 18,
+              "word_count": 1068,
+              "sensational_flags": 0
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 90,
+              "bias_level": "OBJECTIVE",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 0,
+                "sensationalist": 0,
+                "objective": 1
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 38,
+            "cross_verification": 12,
+            "bias_analysis": 13.5
+          },
+          "analyzed_at": "2025-12-03T12:07:05.031796",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "Kremlin signals no Ukraine breakthrough after Putin talks with US 5 hours ago Share Save Maia Davies and Laura Gozzi Share Save EPA Five hours of t...",
+          "original_length": 6526,
+          "summary_length": 150,
+          "compression_ratio": 2.3
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: Kremlin signals no Ukraine breakthrough after Putin talks with US with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "CjAYux42b2k",
+              "title": "Putin Begins Ukraine Talks With Witkoff, Kushner at Kremlin",
+              "description": "YouTube video about Kremlin signals no Ukraine breakthrough after Putin talks with US news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/CjAYux42b2k/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "duration": "Unknown",
+              "views": "Unknown",
+              "published_at": "2025-12-03T12:07:17.296725",
+              "url": "https://www.youtube.com/watch?v=CjAYux42b2k",
+              "embed_url": "https://www.youtube.com/embed/CjAYux42b2k",
+              "relevance_score": 0.9,
+              "scraped": true,
+              "real_video": true
+            }
+          ],
+          "total_found": 1,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 15.24,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "Kremlin signals no Ukraine breakthrough after Putin talks with US 5 hours ago Share Save Maia Davies and Laura Gozzi Share Save EPA Five hours of t...",
+      "insights": {
+        "authenticity_score": 86,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 1,
+            "quotes": 18,
+            "word_count": 1068,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 90,
+            "bias_level": "OBJECTIVE",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 1
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 13.5
+        },
+        "analyzed_at": "2025-12-03T12:07:05.031796",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "Putin Begins Ukraine Talks With Witkoff, Kushner at Kremlin",
+          "url": "https://www.youtube.com/watch?v=CjAYux42b2k",
+          "thumbnail": "https://img.youtube.com/vi/CjAYux42b2k/mqdefault.jpg",
+          "duration": "Unknown",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2025-12-03T06:37:19.759Z"
+    },
+    {
       "id": "https://www.bbc.com/news/articles/c891zkwvjl2o#0",
       "script": "Ecuador votes against allowing foreign military bases in country. Voters have rejected a referendum proposal, dealing a blow to President Daniel Noboa and US ambitions in the region.",
       "tone": "joyful",
       "language": "en",
       "audio_path": "data/audio/20251117/dev/item_6_dev.wav",
       "priority_score": 0.7,
-      "trend_score": 1.0
+      "trend_score": 1
     },
     {
       "id": "https://www.bbc.com/news/articles/cn8vm30rr78o#1",
@@ -16,7 +186,7 @@
       "language": "en",
       "audio_path": "data/audio/20251117/dev/item_8_dev.wav",
       "priority_score": 0.7,
-      "trend_score": 1.0
+      "trend_score": 1
     },
     {
       "id": "https://www.bbc.com/news/articles/cwypzdgwg1yo#0",
@@ -25,7 +195,7 @@
       "language": "en",
       "audio_path": "data/audio/20251117/dev/item_5_dev.wav",
       "priority_score": 0.58,
-      "trend_score": 1.0
+      "trend_score": 1
     },
     {
       "id": "https://www.bbc.com/news/articles/crexy0e2373o#0",

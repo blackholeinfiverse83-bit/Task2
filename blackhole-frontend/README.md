@@ -731,6 +731,18 @@ Create a `.env.local` file:
 # API Configuration
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 
+# Security Configuration (SSPL-III Compliance)
+NEXT_PUBLIC_JWT_TOKEN=your_jwt_token_here
+NEXT_PUBLIC_HMAC_SECRET=your_hmac_secret_here
+
+# Backend Service URLs
+NEXT_PUBLIC_SANKALP_API_BASE=http://localhost:8000
+NEXT_PUBLIC_NOOPUR_API_BASE=http://localhost:8001
+NEXT_PUBLIC_SEEYA_API_BASE=http://localhost:8002
+
+# Audio Configuration
+NEXT_PUBLIC_AUDIO_BASE_URL=http://localhost:8000/data/audio
+
 # Feature Flags
 NEXT_PUBLIC_ENABLE_MOCK_DATA=true
 NEXT_PUBLIC_ENABLE_ANALYTICS=true
@@ -739,6 +751,25 @@ NEXT_PUBLIC_ENABLE_ANALYTICS=true
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
 NEXT_PUBLIC_GA_TRACKING_ID=your_ga_id
 ```
+
+### Security Headers
+
+All API requests automatically include the following security headers:
+
+- **`Authorization`**: `Bearer <JWT_TOKEN>` - JWT authentication token
+- **`X-Client-Nonce`**: `{timestamp}-{uuid}` - Unique request identifier for anti-replay protection
+- **`X-Signature`**: `{hex}` - HMAC-SHA256 signature of request
+- **`X-Timestamp`**: `{unix_timestamp}` - Request timestamp
+
+**Signature Calculation:**
+```
+canonical_string = METHOD|URL|BODY|TIMESTAMP|NONCE
+signature = HMAC-SHA256(canonical_string, HMAC_SECRET)
+```
+
+**Note:** For production deployments, consider using server-side API routes to keep secrets secure. The current client-side implementation is suitable for development and testing but exposes secrets in the browser bundle.
+
+
 
 ---
 
