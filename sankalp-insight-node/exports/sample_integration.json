@@ -1,12 +1,182 @@
 {
   "items": [
     {
+      "id": "scraped_1764840789307_qeejr17bn",
+      "title": "YouTuber Marques Brownlee shutting down phone wallpaper app",
+      "description": "YouTuber Marques Brownlee shutting down phone wallpaper app 2 days ago Share Save Liv McMahon Technology reporter Share Save Getty Images The popul...",
+      "url": "https://www.bbc.com/news/articles/cze81xe3r4yo",
+      "source": "Bbc",
+      "category": "general",
+      "imageUrl": "https://img.youtube.com/vi/C9IBspkuqp4/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "3 min read",
+      "scrapedAt": "2025-12-04T09:33:09.307Z",
+      "scrapedData": {
+        "url": "https://www.bbc.com/news/articles/cze81xe3r4yo",
+        "timestamp": "2025-12-04T15:02:31.155950",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 0.48,
+          "vetting": 0,
+          "summarization": 0.6,
+          "prompt_generation": 0.24,
+          "video_search": 36.82
+        },
+        "scraped_data": {
+          "title": "YouTuber Marques Brownlee shutting down phone wallpaper app",
+          "content_length": 2538,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 84.5,
+          "credibility_rating": "High",
+          "is_reliable": true,
+          "reliability_status": "Reliable",
+          "authenticity_level": "HIGH",
+          "recommendation": "Credible news source",
+          "confidence": 0.85,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 95,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 0,
+              "quotes": 9,
+              "word_count": 440,
+              "sensational_flags": 0
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 80,
+              "bias_level": "NEUTRAL",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 0,
+                "sensationalist": 0,
+                "objective": 0
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 38,
+            "cross_verification": 12,
+            "bias_analysis": 12
+          },
+          "analyzed_at": "2025-12-04T15:02:31.637567",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "YouTuber Marques Brownlee shutting down phone wallpaper app 2 days ago Share Save Liv McMahon Technology reporter Share Save Getty Images The popul...",
+          "original_length": 2538,
+          "summary_length": 150,
+          "compression_ratio": 5.9
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: YouTuber Marques Brownlee shutting down phone wallpaper app with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "C9IBspkuqp4",
+              "title": "MKBHD’s Panels Wallpaper App is Shutting Down: What’s Next? (Full Explanation)",
+              "description": "YouTube video about YouTuber Marques Brownlee shutting down phone wallpaper app news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/C9IBspkuqp4/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "duration": "Unknown",
+              "views": "Unknown",
+              "published_at": "2025-12-04T15:03:07.227711",
+              "url": "https://www.youtube.com/watch?v=C9IBspkuqp4",
+              "embed_url": "https://www.youtube.com/embed/C9IBspkuqp4",
+              "relevance_score": 0.9,
+              "scraped": true,
+              "real_video": true
+            }
+          ],
+          "total_found": 1,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 38.14,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "YouTuber Marques Brownlee shutting down phone wallpaper app 2 days ago Share Save Liv McMahon Technology reporter Share Save Getty Images The popul...",
+      "insights": {
+        "authenticity_score": 84.5,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 9,
+            "word_count": 440,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2025-12-04T15:02:31.637567",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "MKBHD’s Panels Wallpaper App is Shutting Down: What’s Next? (Full Explanation)",
+          "url": "https://www.youtube.com/watch?v=C9IBspkuqp4",
+          "thumbnail": "https://img.youtube.com/vi/C9IBspkuqp4/mqdefault.jpg",
+          "duration": "Unknown",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2025-12-04T09:33:09.316Z"
+    },
+    {
       "id": "scraped_1764743839750_mhdca33bl",
       "title": "Kremlin signals no Ukraine breakthrough after Putin talks with US",
       "description": "Kremlin signals no Ukraine breakthrough after Putin talks with US 5 hours ago Share Save Maia Davies and Laura Gozzi Share Save EPA Five hours of t...",
       "url": "https://www.bbc.com/news/articles/cwyv0ex7v8ro",
       "source": "Bbc",
-      "category": "general",
+      "category": "technology",
       "imageUrl": "https://img.youtube.com/vi/CjAYux42b2k/mqdefault.jpg",
       "publishedAt": "Just now",
       "readTime": "7 min read",

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Menu, X, Activity, Clock, Users } from 'lucide-react'
 
@@ -34,9 +35,9 @@ export default function Header({ backendStatus }: HeaderProps) {
   const navItems = [
     { href: '/', label: '🏠 Home', id: 'home' },
     { href: '/live', label: '🔴 Live Dashboard', id: 'live' },
-    { href: '/feed', label: '📰 News Feed', id: 'feed' },
+    { href: '/analyze', label: '🔬 Analyze', id: 'analyze' },
     { href: '/dashboard', label: '📊 Analytics', id: 'dashboard' },
-    { href: '/advanced', label: '🔬 Analysis', id: 'analysis' },
+    { href: '/advanced', label: '🧪 Advanced', id: 'advanced' },
   ]
 
   const isActive = (href: string) => {
@@ -50,10 +51,14 @@ export default function Header({ backendStatus }: HeaderProps) {
         <div className="flex items-center justify-between">
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
-            <div className="relative w-12 h-12 bg-black rounded-full flex items-center justify-center overflow-hidden">
-              <div className="absolute w-8 h-8 bg-white rounded-full transform -translate-x-0.5"></div>
-              <div className="absolute w-4 h-4 bg-black rounded-full z-10 transform -translate-x-0.5"></div>
-              <div className="absolute w-16 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent transform -rotate-30 animate-spin"></div>
+            <div className="relative w-12 h-12">
+              <Image
+                src="/infiverse-logo.svg"
+                alt="Infiverse logo"
+                fill
+                className="object-contain rounded-full"
+                priority
+              />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">Blackhole Infiverse LLP</h1>
@@ -68,8 +73,8 @@ export default function Header({ backendStatus }: HeaderProps) {
                 key={item.id}
                 href={item.href}
                 className={`transition-colors ${isActive(item.href)
-                    ? 'text-purple-400 font-medium'
-                    : 'text-gray-300 hover:text-white'
+                  ? 'text-purple-400 font-medium'
+                  : 'text-gray-300 hover:text-white'
                   }`}
               >
                 {item.label}
@@ -124,8 +129,8 @@ export default function Header({ backendStatus }: HeaderProps) {
                   key={`mobile-${item.id}`}
                   href={item.href}
                   className={`transition-colors ${isActive(item.href)
-                      ? 'text-purple-400 font-medium'
-                      : 'text-gray-300 hover:text-white'
+                    ? 'text-purple-400 font-medium'
+                    : 'text-gray-300 hover:text-white'
                     }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

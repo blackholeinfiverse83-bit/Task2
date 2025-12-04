@@ -66,7 +66,15 @@ module.exports = {
           800: '#86198f',
           900: '#701a75',
           950: '#4a044e',
-        }
+        },
+        paper: '#f0e6d2',
+        ink: '#1a1a1a',
+        'accent-yellow': '#f5d547',
+        'accent-red': '#ff4444',
+      },
+      fontFamily: {
+        serif: ['Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
