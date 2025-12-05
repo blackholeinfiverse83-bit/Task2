@@ -6227,6 +6227,47 @@ async def unified_news_workflow(request: Dict[str, Any]):
             timestamp=datetime.now().isoformat()
         )
 
+# Serve Sankalp export files
+@app.get("/exports/weekly_report.json")
+async def get_weekly_report():
+    """Serve the weekly_report.json from sankalp-insight-node/exports"""
+    try:
+        # Get the project root directory (parent of unified_tools_backend)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        file_path = os.path.join(project_root, "sankalp-insight-node", "exports", "weekly_report.json")
+        
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data
+        else:
+            # Return empty structure if file doesn't exist
+            return {"items": [], "generated_at": None}
+    except Exception as e:
+        # Return empty structure on error
+        return {"items": [], "generated_at": None, "error": str(e)}
+
+@app.get("/exports/sample_integration.json")
+async def get_sample_integration():
+    """Serve the sample_integration.json from sankalp-insight-node/exports"""
+    try:
+        # Get the project root directory (parent of unified_tools_backend)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        file_path = os.path.join(project_root, "sankalp-insight-node", "exports", "sample_integration.json")
+        
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data
+        else:
+            # Return empty structure if file doesn't exist
+            return {"items": []}
+    except Exception as e:
+        # Return empty structure on error
+        return {"items": [], "error": str(e)}
+
 # Health check
 @app.get("/health")
 async def health_check():

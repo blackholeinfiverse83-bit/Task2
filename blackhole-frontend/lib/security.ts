@@ -102,7 +102,11 @@ export async function signRequest(payload: SignaturePayload): Promise<string> {
         const secret = process.env.NEXT_PUBLIC_HMAC_SECRET || ''
 
         if (!secret || secret === 'your_hmac_secret_here') {
-            console.warn('HMAC secret not configured, using empty signature')
+            // Suppress warning in production - only log once per session
+            if (typeof window !== 'undefined' && !(window as any).__hmacWarningLogged) {
+                console.debug('HMAC secret not configured, using empty signature (this is normal in development)')
+                ;(window as any).__hmacWarningLogged = true
+            }
             return ''
         }
 

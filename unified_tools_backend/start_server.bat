@@ -20,8 +20,9 @@ if %errorlevel% neq 0 (
 echo ✅ Python found: %PYTHON_CMD%
 echo.
 
-echo 📦 Installing required packages...
-%PYTHON_CMD% -m pip install fastapi uvicorn requests beautifulsoup4 pandas numpy httpx python-dotenv pydantic
+echo 📦 Installing required packages from requirements.txt...
+%PYTHON_CMD% -m pip install --upgrade pip
+%PYTHON_CMD% -m pip install -r requirements.txt
 
 echo.
 echo 🚀 Starting server...

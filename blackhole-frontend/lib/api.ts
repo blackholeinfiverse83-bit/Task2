@@ -204,34 +204,72 @@ export interface FeedbackResponse {
  */
 export async function getSankalpFeed(): Promise<SankalpFeedResponse> {
   try {
+    // Check if backend is available first
+    const isBackendAvailable = await checkBackendHealth()
+    if (!isBackendAvailable) {
+      // Backend not available, return empty feed silently
+      return { items: [] }
+    }
+
     const url = `${SANKALP_API_BASE}/exports/weekly_report.json`
     const secureHeaders = await buildSecureHeaders(url, 'GET')
 
+    // Create abort controller for timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
     // Try to fetch from weekly_report.json endpoint
     // If Sankalp doesn't expose this, we'll need to adjust
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...secureHeaders,
-      },
-    })
+    let response: Response
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...secureHeaders,
+        },
+        signal: controller.signal,
+      })
+      clearTimeout(timeoutId)
+    } catch (fetchError) {
+      clearTimeout(timeoutId)
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        // Timeout - return empty feed
+        return { items: [] }
+      }
+      throw fetchError
+    }
 
     if (!response.ok) {
       // Fallback: try sample_integration.json
       const fallbackUrl = `${SANKALP_API_BASE}/exports/sample_integration.json`
       const fallbackHeaders = await buildSecureHeaders(fallbackUrl, 'GET')
+      const fallbackController = new AbortController()
+      const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 5000)
 
-      const fallbackResponse = await fetch(fallbackUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...fallbackHeaders,
-        },
-      })
+      let fallbackResponse: Response
+      try {
+        fallbackResponse = await fetch(fallbackUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...fallbackHeaders,
+          },
+          signal: fallbackController.signal,
+        })
+        clearTimeout(fallbackTimeoutId)
+      } catch (fetchError) {
+        clearTimeout(fallbackTimeoutId)
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          // Timeout - return empty feed
+          return { items: [] }
+        }
+        throw fetchError
+      }
 
       if (!fallbackResponse.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Silently return empty feed instead of throwing
+        return { items: [] }
       }
 
       const data = await fallbackResponse.json()
@@ -241,7 +279,11 @@ export async function getSankalpFeed(): Promise<SankalpFeedResponse> {
     const data = await response.json()
     return { items: data.items || [], generated_at: data.generated_at }
   } catch (error) {
-    console.error('Failed to fetch Sankalp feed:', error)
+    // Only log error once to prevent console spam
+    if (!(error as any).__logged) {
+      console.warn('⚠️ Sankalp feed unavailable (backend may be offline):', error instanceof Error ? error.message : 'Unknown error')
+      ;(error as any).__logged = true
+    }
     // Return empty feed on error
     return { items: [] }
   }
