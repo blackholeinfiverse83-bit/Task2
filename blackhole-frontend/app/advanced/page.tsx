@@ -198,7 +198,7 @@ export default function AdvancedNewsAnalysisPage() {
       setTimeout(() => {
         if (response.success) {
           console.log('✅ Advanced analysis successful!')
-          setAnalysisResults(response.data)
+          setAnalysisResults(response.data || null)
         } else {
           console.error('❌ Advanced analysis failed:', response.message)
           setError(response.message || 'Analysis failed')
@@ -446,7 +446,7 @@ export default function AdvancedNewsAnalysisPage() {
 
                       {/* Step Info */}
                       <h4 className={`font-semibold text-lg mb-2 text-center transition-colors duration-300 ${status === 'completed' ? 'text-green-400' :
-                          status === 'active' ? 'text-purple-400' : 'text-gray-500'
+                        status === 'active' ? 'text-purple-400' : 'text-gray-500'
                         }`}>
                         {step.name}
                       </h4>

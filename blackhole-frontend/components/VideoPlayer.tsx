@@ -20,6 +20,8 @@ interface Video {
   video_id?: string
   mock_data?: boolean
   demo_video?: boolean
+  working_video?: boolean
+  relevance_score?: number
 }
 
 interface VideoPlayerProps {
@@ -39,7 +41,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const playerContainerRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<any>(null)
-  
+
   // Prevent hydration errors by only rendering iframe on client
   useEffect(() => {
     setIsMounted(true)
@@ -453,7 +455,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
             <span>{currentVideoData.duration || "0:00"}</span>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-1">
-            <div 
+            <div
               className="bg-gradient-to-r from-purple-500 to-pink-500 h-1 rounded-full transition-all duration-300"
               style={{ width: isPlaying ? '45%' : '20%' }}
             ></div>
@@ -470,7 +472,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
         >
           <SkipBack className="w-5 h-5 text-gray-400 hover:text-white" />
         </button>
-        
+
         <button
           onClick={togglePlay}
           className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full transition-all duration-200 hover:scale-105"
@@ -481,7 +483,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
             <Play className="w-6 h-6 text-white ml-0.5" />
           )}
         </button>
-        
+
         <button
           onClick={nextVideo}
           className="p-3 hover:bg-white/10 rounded-full transition-colors"
@@ -489,12 +491,12 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
         >
           <SkipForward className="w-5 h-5 text-gray-400 hover:text-white" />
         </button>
-        
+
         <button className="p-3 hover:bg-white/10 rounded-full transition-colors">
           <Volume2 className="w-5 h-5 text-gray-400 hover:text-white" />
         </button>
-        
-        <button 
+
+        <button
           onClick={openInNewTab}
           className="p-3 hover:bg-white/10 rounded-full transition-colors"
         >
@@ -513,11 +515,10 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
               <div
                 key={index}
                 onClick={() => selectVideo(index)}
-                className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                  index === currentVideo
+                className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${index === currentVideo
                     ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30'
                     : 'hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <div className="relative flex-shrink-0">
                   <img
@@ -535,7 +536,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <h5 className="text-sm font-medium text-white truncate">
                     {video.title}
