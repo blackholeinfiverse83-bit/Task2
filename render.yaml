@@ -5,7 +5,7 @@ services:
     runtime: python
     region: oregon
     plan: free
-    branch: main
+    branch: master
     rootDir: unified_tools_backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
@@ -32,7 +32,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    branch: main
+    branch: master
     rootDir: blackhole-frontend
     buildCommand: npm install && npm run build
     startCommand: npm start
