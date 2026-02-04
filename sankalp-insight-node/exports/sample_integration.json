@@ -1,6 +1,516 @@
 {
   "items": [
     {
+      "id": "scraped_1770197215589_oev0srpyv",
+      "title": "NewsNews",
+      "description": "News News Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed it...",
+      "url": "https://www.bbc.com/news",
+      "source": "Bbc",
+      "category": "environment",
+      "imageUrl": "https://img.youtube.com/vi/DMHoRP7tR_c/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "8 min read",
+      "scrapedAt": "2026-02-04T09:26:55.589Z",
+      "scrapedData": {
+        "url": "https://www.bbc.com/news",
+        "timestamp": "2026-02-04T14:56:34.222848",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 0.4,
+          "vetting": 0,
+          "summarization": 0.6,
+          "prompt_generation": 0.23,
+          "video_search": 20.13
+        },
+        "scraped_data": {
+          "title": "NewsNews",
+          "content_length": 7791,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 82.1,
+          "credibility_rating": "High",
+          "is_reliable": true,
+          "reliability_status": "Reliable",
+          "authenticity_level": "HIGH",
+          "recommendation": "Credible news source",
+          "confidence": 0.85,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 89,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 0,
+              "quotes": 3,
+              "word_count": 1294,
+              "sensational_flags": 0
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 80,
+              "bias_level": "NEUTRAL",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 0,
+                "sensationalist": 0,
+                "objective": 0
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 35.6,
+            "cross_verification": 12,
+            "bias_analysis": 12
+          },
+          "analyzed_at": "2026-02-04T14:56:34.627324",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "News News Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed it...",
+          "original_length": 7791,
+          "summary_length": 150,
+          "compression_ratio": 1.9
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: NewsNews with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "DMHoRP7tR_c",
+              "title": "Peter Mandelson quits over Jeffrey Epstein links | Sky News coverage and analysis",
+              "description": "YouTube video about NewsNews news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/DMHoRP7tR_c/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "duration": "Unknown",
+              "views": "Unknown",
+              "published_at": "2026-02-04T14:56:53.233787",
+              "url": "https://www.youtube.com/watch?v=DMHoRP7tR_c",
+              "embed_url": "https://www.youtube.com/embed/DMHoRP7tR_c",
+              "relevance_score": 0.9,
+              "scraped": true,
+              "real_video": true
+            }
+          ],
+          "total_found": 1,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 21.36,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "News News Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed it...",
+      "insights": {
+        "authenticity_score": 82.1,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 89,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 3,
+            "word_count": 1294,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 35.6,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2026-02-04T14:56:34.627324",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "Peter Mandelson quits over Jeffrey Epstein links | Sky News coverage and analysis",
+          "url": "https://www.youtube.com/watch?v=DMHoRP7tR_c",
+          "thumbnail": "https://img.youtube.com/vi/DMHoRP7tR_c/mqdefault.jpg",
+          "duration": "Unknown",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2026-02-04T09:26:55.598Z"
+    },
+    {
+      "id": "scraped_1770197071654_zdq5dav0r",
+      "title": "Access Restricted",
+      "description": "This website is blocking automated access. Common restrictions detected: JavaScript required, bot protection, or access verification needed.",
+      "url": "https://www.nytimes.com/2026/02/04/world/europe/ukraine-russia-us-peace-talks.html",
+      "source": "Nytimes",
+      "category": "general",
+      "imageUrl": "https://img.youtube.com/vi/8p1i5xK2Ju0/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "1 min read",
+      "scrapedAt": "2026-02-04T09:24:31.654Z",
+      "scrapedData": {
+        "url": "https://www.nytimes.com/2026/02/04/world/europe/ukraine-russia-us-peace-talks.html",
+        "timestamp": "2026-02-04T14:54:19.394592",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 0.51,
+          "vetting": 0,
+          "summarization": 0.61,
+          "prompt_generation": 0.23,
+          "video_search": 10.89
+        },
+        "scraped_data": {
+          "title": "Access Restricted",
+          "content_length": 140,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 74.5,
+          "credibility_rating": "Medium",
+          "is_reliable": true,
+          "reliability_status": "Questionable",
+          "authenticity_level": "MEDIUM",
+          "recommendation": "Verify with additional sources",
+          "confidence": 0.6,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 70,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 0,
+              "quotes": 0,
+              "word_count": 17,
+              "sensational_flags": 0
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 80,
+              "bias_level": "NEUTRAL",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 0,
+                "sensationalist": 0,
+                "objective": 0
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 28,
+            "cross_verification": 12,
+            "bias_analysis": 12
+          },
+          "analyzed_at": "2026-02-04T14:54:19.907795",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "This website is blocking automated access. Common restrictions detected: JavaScript required, bot protection, or access verification needed.",
+          "original_length": 140,
+          "summary_length": 140,
+          "compression_ratio": 100
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: Access Restricted with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "8p1i5xK2Ju0",
+              "title": "Kedarnath Helicopter Accident | En route Kedarnath, Chopper Goes Into Tailspin",
+              "description": "YouTube video about Access Restricted news latest",
+              "thumbnail": "https://img.youtube.com/vi/8p1i5xK2Ju0/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "duration": "Unknown",
+              "views": "Unknown",
+              "published_at": "2026-02-04T14:54:29.437501",
+              "url": "https://www.youtube.com/watch?v=8p1i5xK2Ju0",
+              "embed_url": "https://www.youtube.com/embed/8p1i5xK2Ju0",
+              "relevance_score": 0.9,
+              "scraped": true,
+              "real_video": true
+            }
+          ],
+          "total_found": 1,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 12.24,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "This website is blocking automated access. Common restrictions detected: JavaScript required, bot protection, or access verification needed.",
+      "insights": {
+        "authenticity_score": 74.5,
+        "credibility_rating": "Medium",
+        "is_reliable": true,
+        "reliability_status": "Questionable",
+        "authenticity_level": "MEDIUM",
+        "recommendation": "Verify with additional sources",
+        "confidence": 0.6,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 70,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 0,
+            "word_count": 17,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 28,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2026-02-04T14:54:19.907795",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "Kedarnath Helicopter Accident | En route Kedarnath, Chopper Goes Into Tailspin",
+          "url": "https://www.youtube.com/watch?v=8p1i5xK2Ju0",
+          "thumbnail": "https://img.youtube.com/vi/8p1i5xK2Ju0/mqdefault.jpg",
+          "duration": "Unknown",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2026-02-04T09:24:31.768Z"
+    },
+    {
+      "id": "scraped_1770195472457_aru6ikjq1",
+      "title": "Access Restricted",
+      "description": "This website is blocking automated access. Common restrictions detected: JavaScript required, bot protection, or access verification needed.",
+      "url": "https://www.nytimes.com/2026/02/03/style/devil-wears-prada-sequel-trailer-chat.html",
+      "source": "Nytimes",
+      "category": "general",
+      "imageUrl": "https://img.youtube.com/vi/Mv8JGaz0fZ8/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "1 min read",
+      "scrapedAt": "2026-02-04T08:57:52.457Z",
+      "scrapedData": {
+        "url": "https://www.nytimes.com/2026/02/03/style/devil-wears-prada-sequel-trailer-chat.html",
+        "timestamp": "2026-02-04T14:27:31.120170",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 0.67,
+          "vetting": 0,
+          "summarization": 3.75,
+          "prompt_generation": 0.25,
+          "video_search": 16.66
+        },
+        "scraped_data": {
+          "title": "Access Restricted",
+          "content_length": 140,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 74.5,
+          "credibility_rating": "Medium",
+          "is_reliable": true,
+          "reliability_status": "Questionable",
+          "authenticity_level": "MEDIUM",
+          "recommendation": "Verify with additional sources",
+          "confidence": 0.6,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 70,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 0,
+              "quotes": 0,
+              "word_count": 17,
+              "sensational_flags": 0
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 80,
+              "bias_level": "NEUTRAL",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 0,
+                "sensationalist": 0,
+                "objective": 0
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 28,
+            "cross_verification": 12,
+            "bias_analysis": 12
+          },
+          "analyzed_at": "2026-02-04T14:27:31.796162",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "This website is blocking automated access. Common restrictions detected: JavaScript required, bot protection, or access verification needed.",
+          "original_length": 140,
+          "summary_length": 140,
+          "compression_ratio": 100
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: Access Restricted with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "Mv8JGaz0fZ8",
+              "title": "White House imposes new access restrictions on journalists",
+              "description": "YouTube video about Access Restricted news latest",
+              "thumbnail": "https://img.youtube.com/vi/Mv8JGaz0fZ8/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "duration": "Unknown",
+              "views": "Unknown",
+              "published_at": "2026-02-04T14:27:46.059833",
+              "url": "https://www.youtube.com/watch?v=Mv8JGaz0fZ8",
+              "embed_url": "https://www.youtube.com/embed/Mv8JGaz0fZ8",
+              "relevance_score": 0.9,
+              "scraped": true,
+              "real_video": true
+            }
+          ],
+          "total_found": 1,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 21.33,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "This website is blocking automated access. Common restrictions detected: JavaScript required, bot protection, or access verification needed.",
+      "insights": {
+        "authenticity_score": 74.5,
+        "credibility_rating": "Medium",
+        "is_reliable": true,
+        "reliability_status": "Questionable",
+        "authenticity_level": "MEDIUM",
+        "recommendation": "Verify with additional sources",
+        "confidence": 0.6,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 70,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 0,
+            "word_count": 17,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 28,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2026-02-04T14:27:31.796162",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "White House imposes new access restrictions on journalists",
+          "url": "https://www.youtube.com/watch?v=Mv8JGaz0fZ8",
+          "thumbnail": "https://img.youtube.com/vi/Mv8JGaz0fZ8/mqdefault.jpg",
+          "duration": "Unknown",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2026-02-04T08:57:52.473Z"
+    },
+    {
       "id": "scraped_1764840789307_qeejr17bn",
       "title": "YouTuber Marques Brownlee shutting down phone wallpaper app",
       "description": "YouTuber Marques Brownlee shutting down phone wallpaper app 2 days ago Share Save Liv McMahon Technology reporter Share Save Getty Images The popul...",
