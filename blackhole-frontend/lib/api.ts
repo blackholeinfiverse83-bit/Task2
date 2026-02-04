@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000'
+const API_BASE = process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000'
 const SANKALP_API_BASE = process.env.NEXT_PUBLIC_SANKALP_API_BASE || 'http://localhost:8000'
 
 export interface WorkflowResult {
@@ -282,7 +282,7 @@ export async function getSankalpFeed(): Promise<SankalpFeedResponse> {
     // Only log error once to prevent console spam
     if (!(error as any).__logged) {
       console.warn('⚠️ Sankalp feed unavailable (backend may be offline):', error instanceof Error ? error.message : 'Unknown error')
-      ;(error as any).__logged = true
+        ; (error as any).__logged = true
     }
     // Return empty feed on error
     return { items: [] }
