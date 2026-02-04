@@ -79,6 +79,7 @@ export async function checkBackendHealth(): Promise<boolean> {
 
 export async function runUnifiedWorkflow(url: string): Promise<WorkflowResult> {
   try {
+    console.log(`📡 Connecting to backend at: ${API_BASE}`)
     const response = await fetch(`${API_BASE}/api/unified-news-workflow`, {
       method: 'POST',
       headers: {

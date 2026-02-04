@@ -6,7 +6,7 @@
 
 import { buildSecureHeaders } from '../lib/security'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000';
 
 // Check if real backend is available
 let backendAvailable = false;
@@ -223,11 +223,11 @@ class APIService {
   constructor() {
     this.useMockData = false; // Try real backend first, fallback to mock
     this.backendChecked = false;
-    
+
     // Auto-check backend on initialization
     this.initialize();
   }
-  
+
   async initialize() {
     if (!this.backendChecked) {
       const available = await checkBackendAvailability();
@@ -246,10 +246,10 @@ class APIService {
       try {
         const url = `${API_BASE_URL}${endpoint}`
         const method = options.method || 'GET'
-        
+
         // Build security headers
         const secureHeaders = await buildSecureHeaders(url, method, options.body ? JSON.parse(options.body) : null)
-        
+
         const response = await fetch(url, {
           ...options,
           headers: {
@@ -279,7 +279,7 @@ class APIService {
         return this.getMockResponse(endpoint)
       }
     }
-    
+
     // Use mock data
     return this.getMockResponse(endpoint)
   }
@@ -434,14 +434,14 @@ class APIService {
     this.useMockData = useMock;
     console.log(`API Service mode: ${useMock ? 'Mock Data' : 'Real Backend'}`);
   }
-  
+
   /**
    * Get backend availability status
    */
   isBackendAvailable() {
     return backendAvailable;
   }
-  
+
   /**
    * Force backend check
    */
@@ -450,7 +450,7 @@ class APIService {
     await this.initialize();
     return backendAvailable;
   }
-  
+
   /**
    * Get API base URL
    */
