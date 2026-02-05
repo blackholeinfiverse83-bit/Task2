@@ -1,6 +1,207 @@
 {
   "items": [
     {
+      "id": "scraped_1770263747394_8x9rdse5b",
+      "title": "Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota",
+      "description": "Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota 3 hours ago Share Save Lisa Lambert Share Save Watch: Minneapoli...",
+      "url": "https://www.bbc.com/news/articles/c4g5nx130neo",
+      "source": "Bbc",
+      "category": "general",
+      "imageUrl": "https://img.youtube.com/vi/Sdn5cj5Hmk0/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "5 min read",
+      "scrapedAt": "2026-02-05T03:55:47.394Z",
+      "scrapedData": {
+        "url": "https://www.bbc.com/news/articles/c4g5nx130neo",
+        "timestamp": "2026-02-05T09:25:44.888544",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 0.17,
+          "vetting": 0,
+          "summarization": 1.03,
+          "prompt_generation": 0.22,
+          "video_search": 1.08
+        },
+        "scraped_data": {
+          "title": "Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota",
+          "content_length": 4394,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 84.5,
+          "credibility_rating": "High",
+          "is_reliable": true,
+          "reliability_status": "Reliable",
+          "authenticity_level": "HIGH",
+          "recommendation": "Credible news source",
+          "confidence": 0.85,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 95,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 0,
+              "quotes": 20,
+              "word_count": 734,
+              "sensational_flags": 0
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 80,
+              "bias_level": "NEUTRAL",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 0,
+                "sensationalist": 0,
+                "objective": 0
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 38,
+            "cross_verification": 12,
+            "bias_analysis": 12
+          },
+          "analyzed_at": "2026-02-05T09:25:45.060870",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota 3 hours ago Share Save Lisa Lambert Share Save Watch: Minneapoli...",
+          "original_length": 4394,
+          "summary_length": 150,
+          "compression_ratio": 3.4
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "Sdn5cj5Hmk0",
+              "title": "Video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news ",
+              "description": "YouTube video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/Sdn5cj5Hmk0/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "url": "https://www.youtube.com/watch?v=Sdn5cj5Hmk0",
+              "embed_url": "https://www.youtube.com/embed/Sdn5cj5Hmk0",
+              "relevance_score": 0.85,
+              "real_video": true
+            },
+            {
+              "source": "youtube",
+              "video_id": "2tVO9nL6FGU",
+              "title": "Video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news ",
+              "description": "YouTube video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/2tVO9nL6FGU/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "url": "https://www.youtube.com/watch?v=2tVO9nL6FGU",
+              "embed_url": "https://www.youtube.com/embed/2tVO9nL6FGU",
+              "relevance_score": 0.85,
+              "real_video": true
+            },
+            {
+              "source": "youtube",
+              "video_id": "vaWoX50l0B4",
+              "title": "Video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news ",
+              "description": "YouTube video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/vaWoX50l0B4/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "url": "https://www.youtube.com/watch?v=vaWoX50l0B4",
+              "embed_url": "https://www.youtube.com/embed/vaWoX50l0B4",
+              "relevance_score": 0.85,
+              "real_video": true
+            }
+          ],
+          "total_found": 3,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 2.5,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota 3 hours ago Share Save Lisa Lambert Share Save Watch: Minneapoli...",
+      "insights": {
+        "authenticity_score": 84.5,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 0,
+            "quotes": 20,
+            "word_count": 734,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 80,
+            "bias_level": "NEUTRAL",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 0,
+              "sensationalist": 0,
+              "objective": 0
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 12
+        },
+        "analyzed_at": "2026-02-05T09:25:45.060870",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "Video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news ",
+          "url": "https://www.youtube.com/watch?v=Sdn5cj5Hmk0",
+          "thumbnail": "https://img.youtube.com/vi/Sdn5cj5Hmk0/mqdefault.jpg",
+          "source": "youtube"
+        },
+        {
+          "title": "Video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news ",
+          "url": "https://www.youtube.com/watch?v=2tVO9nL6FGU",
+          "thumbnail": "https://img.youtube.com/vi/2tVO9nL6FGU/mqdefault.jpg",
+          "source": "youtube"
+        },
+        {
+          "title": "Video about Trump touts 'softer touch' on immigration as federal force is reduced in Minnesota news ",
+          "url": "https://www.youtube.com/watch?v=vaWoX50l0B4",
+          "thumbnail": "https://img.youtube.com/vi/vaWoX50l0B4/mqdefault.jpg",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2026-02-05T03:55:47.404Z"
+    },
+    {
       "id": "scraped_1770204028158_cuxno8r6z",
       "title": "What could happen if the US strikes Iran?",
       "description": "Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed its attacks ...",
