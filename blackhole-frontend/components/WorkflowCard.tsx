@@ -157,7 +157,9 @@ export default function WorkflowCard({ onStart, isActive, backendOnline }: Workf
             <div className="bg-black/30 rounded-lg p-4">
               <h4 className="text-blue-400 font-semibold mb-2">📝 Summary</h4>
               <div className="text-sm text-gray-300 space-y-2">
-                <p className="italic">"{results.summary.text || 'No summary available'}"</p>
+                <p className="italic">
+                  &ldquo;{results.summary.text || 'No summary available'}&rdquo;
+                </p>
                 <div className="flex space-x-4 text-xs text-gray-400">
                   <span>Original: {results.summary.original_length || 0} chars</span>
                   <span>Summary: {results.summary.summary_length || 0} chars</span>
@@ -172,7 +174,7 @@ export default function WorkflowCard({ onStart, isActive, backendOnline }: Workf
             <div className="bg-black/30 rounded-lg p-4">
               <h4 className="text-green-400 font-semibold mb-2">💡 Video Generation Prompt</h4>
               <p className="text-sm text-gray-300 italic">
-                "{results.video_prompt.prompt?.substring(0, 200) || 'No prompt generated'}..."
+                &ldquo;{results.video_prompt.prompt?.substring(0, 200) || 'No prompt generated'}...&rdquo;
               </p>
             </div>
           )}

@@ -1,6 +1,176 @@
 {
   "items": [
     {
+      "id": "scraped_1770204028158_cuxno8r6z",
+      "title": "What could happen if the US strikes Iran?",
+      "description": "Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed its attacks ...",
+      "url": "https://www.bbc.com/",
+      "source": "Bbc",
+      "category": "environment",
+      "imageUrl": "https://img.youtube.com/vi/fVzrbBfzVBk/mqdefault.jpg",
+      "publishedAt": "Just now",
+      "readTime": "13 min read",
+      "scrapedAt": "2026-02-04T11:20:28.158Z",
+      "scrapedData": {
+        "url": "https://www.bbc.com/",
+        "timestamp": "2026-02-04T16:49:52.793984",
+        "workflow_steps": [
+          "scraping",
+          "vetting",
+          "summarization",
+          "prompt_generation",
+          "video_search"
+        ],
+        "processing_time": {
+          "scraping": 1.17,
+          "vetting": 0.01,
+          "summarization": 1.69,
+          "prompt_generation": 0.3,
+          "video_search": 32.18
+        },
+        "scraped_data": {
+          "title": "What could happen if the US strikes Iran?",
+          "content_length": 12183,
+          "author": {},
+          "date": ""
+        },
+        "vetting_results": {
+          "authenticity_score": 79.2,
+          "credibility_rating": "High",
+          "is_reliable": true,
+          "reliability_status": "Reliable",
+          "authenticity_level": "HIGH",
+          "recommendation": "Credible news source",
+          "confidence": 0.85,
+          "analysis_details": {
+            "content_analysis": {
+              "overall_score": 78,
+              "method": "enhanced_rule_based",
+              "factual_phrases": 1,
+              "quotes": 1,
+              "word_count": 1991,
+              "sensational_flags": 1
+            },
+            "source_credibility": {
+              "score": 90
+            },
+            "bias_detection": {
+              "score": 90,
+              "bias_level": "OBJECTIVE",
+              "bias_indicators": {
+                "left_bias": 0,
+                "right_bias": 1,
+                "sensationalist": 1,
+                "objective": 1
+              },
+              "sentiment": "neutral"
+            }
+          },
+          "scoring_breakdown": {
+            "source_credibility": 22.5,
+            "content_analysis": 31.2,
+            "cross_verification": 12,
+            "bias_analysis": 13.5
+          },
+          "analyzed_at": "2026-02-04T16:49:53.966832",
+          "analysis_version": "working_v3.0"
+        },
+        "summary": {
+          "text": "Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed its attacks ...",
+          "original_length": 12183,
+          "summary_length": 150,
+          "compression_ratio": 1.2
+        },
+        "video_prompt": {
+          "prompt": "Analyze the News summary: What could happen if the US strikes Iran? with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+          "for_video_creation": true,
+          "based_on_summary": true
+        },
+        "ai_video_generation": {
+          "success": false,
+          "error": "name 'AIVideoGenerationService' is not defined",
+          "fallback_available": true
+        },
+        "sidebar_videos": {
+          "videos": [
+            {
+              "source": "youtube",
+              "video_id": "fVzrbBfzVBk",
+              "title": "What could happen if the US strikes Iran? #Iran #US #BBCNews",
+              "description": "YouTube video about What could happen if the US strikes Iran? news coverage analysis",
+              "thumbnail": "https://img.youtube.com/vi/fVzrbBfzVBk/mqdefault.jpg",
+              "channel": "YouTube Channel",
+              "duration": "Unknown",
+              "views": "Unknown",
+              "published_at": "2026-02-04T16:50:13.328346",
+              "url": "https://www.youtube.com/watch?v=fVzrbBfzVBk",
+              "embed_url": "https://www.youtube.com/embed/fVzrbBfzVBk",
+              "relevance_score": 0.9,
+              "scraped": true,
+              "real_video": true
+            }
+          ],
+          "total_found": 1,
+          "ready_for_playback": true
+        },
+        "total_processing_time": 35.35,
+        "workflow_complete": true,
+        "steps_completed": 5
+      },
+      "summary": "Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed its attacks ...",
+      "insights": {
+        "authenticity_score": 79.2,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 78,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 1,
+            "quotes": 1,
+            "word_count": 1991,
+            "sensational_flags": 1
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 90,
+            "bias_level": "OBJECTIVE",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 1,
+              "sensationalist": 1,
+              "objective": 1
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 31.2,
+          "cross_verification": 12,
+          "bias_analysis": 13.5
+        },
+        "analyzed_at": "2026-02-04T16:49:53.966832",
+        "analysis_version": "working_v3.0"
+      },
+      "relatedVideos": [
+        {
+          "title": "What could happen if the US strikes Iran? #Iran #US #BBCNews",
+          "url": "https://www.youtube.com/watch?v=fVzrbBfzVBk",
+          "thumbnail": "https://img.youtube.com/vi/fVzrbBfzVBk/mqdefault.jpg",
+          "duration": "Unknown",
+          "source": "youtube"
+        }
+      ],
+      "storedAt": "2026-02-04T11:20:28.183Z"
+    },
+    {
       "id": "scraped_1770197215589_oev0srpyv",
       "title": "NewsNews",
       "description": "News News Russian attacks on Ukraine energy sites 'particularly depraved', UK PM Starmer says The UK leader's comments came after Russia renewed it...",

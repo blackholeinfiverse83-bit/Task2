@@ -13,13 +13,13 @@ interface TTSPlayerProps {
   onPlayComplete?: () => void
 }
 
-export default function TTSPlayer({ 
+export default function TTSPlayer({
   audioUrl,
   audioPath, // Sankalp audio_path
-  title = 'News Audio', 
+  title = 'News Audio',
   duration = 0,
   newsId,
-  onPlayComplete 
+  onPlayComplete
 }: TTSPlayerProps) {
   // Use audioPath if provided (Sankalp), otherwise fall back to audioUrl
   const resolvedAudioUrl = audioPath ? getAudioUrl(audioPath) : (audioUrl || null)
@@ -65,18 +65,23 @@ export default function TTSPlayer({
     }
   }, [resolvedAudioUrl, duration, onPlayComplete])
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const audio = audioRef.current
     if (!audio) return
 
     if (isPlaying) {
       audio.pause()
+      setIsPlaying(false)
     } else {
-      audio.play()
+      try {
+        await audio.play()
+        setIsPlaying(true)
+      } catch (error) {
+        console.error('Audio playback failed:', error)
+        setIsPlaying(false)
+      }
     }
-    setIsPlaying(!isPlaying)
   }
-
   const handleRestart = () => {
     const audio = audioRef.current
     if (!audio) return
@@ -104,7 +109,7 @@ export default function TTSPlayer({
   const toggleMute = () => {
     const audio = audioRef.current
     if (!audio) return
-    
+
     if (isMuted) {
       audio.volume = volume || 0.5
       setIsMuted(false)
@@ -159,7 +164,12 @@ export default function TTSPlayer({
   return (
     <div className="glass-effect rounded-xl p-6 border border-white/20">
       {/* Audio Element */}
-      <audio ref={audioRef} src={resolvedAudioUrl || undefined} preload="metadata" />
+      <audio
+        ref={audioRef}
+        src={resolvedAudioUrl || undefined}
+        preload="metadata"
+        onError={(e) => console.error('Audio resource error:', e.currentTarget.error, 'URL:', resolvedAudioUrl)}
+      />
 
       {/* Header */}
       <div className="mb-4">

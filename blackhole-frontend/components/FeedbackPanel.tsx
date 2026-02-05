@@ -283,7 +283,7 @@ export default function FeedbackPanel({
           <div>
             <h4 className="text-sm font-semibold text-white mb-1">Reinforcement Learning</h4>
             <p className="text-xs text-gray-400">
-              Your feedback helps train our AI to provide better news recommendations. Each interaction improves the system's understanding of quality content.
+              Your feedback helps train our AI to provide better news recommendations. Each interaction improves the system&apos;s understanding of quality content.
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
               <div className="bg-black/30 rounded px-2 py-1">

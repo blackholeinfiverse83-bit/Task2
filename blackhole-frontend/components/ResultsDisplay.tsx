@@ -393,7 +393,7 @@ export default function ResultsDisplay({ results }: ResultsDisplayProps) {
             {/* Summary Text */}
             <div className="bg-black/30 rounded-lg p-4 border-l-4 border-green-500">
               <p className="text-gray-200 leading-relaxed text-lg">
-                "{getSafeString(results.summary, 'Summary generated successfully')}"
+                &ldquo;{getSafeString(results.summary, 'Summary generated successfully')}&rdquo;
               </p>
             </div>
             

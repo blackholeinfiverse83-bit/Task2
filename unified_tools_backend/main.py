@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.staticfiles import StaticFiles
 import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -50,6 +51,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount Sankalp data directory for static files (audio, reports)
+try:
+    # Go up one level from unified_tools_backend to project root, then into sankalp-insight-node
+    sankalp_base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "sankalp-insight-node"))
+    
+    # Serve /data (for audio files)
+    data_dir = os.path.join(sankalp_base, "data")
+    if os.path.exists(data_dir):
+        app.mount("/data", StaticFiles(directory=data_dir), name="data")
+        print(f"✅ Mounted /data -> {data_dir}")
+    else:
+        print(f"⚠️ Could not mount /data: Directory not found at {data_dir}")
+
+    # Serve /exports (for weekly_report.json)
+    exports_dir = os.path.join(sankalp_base, "exports")
+    if os.path.exists(exports_dir):
+        app.mount("/exports", StaticFiles(directory=exports_dir), name="exports")
+        print(f"✅ Mounted /exports -> {exports_dir}")
+    else:
+        print(f"⚠️ Could not mount /exports: Directory not found at {exports_dir}")
+        
+except Exception as e:
+    print(f"❌ Error mounting static files: {e}")
 
 # Environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") if os.getenv("ENABLE_OPENAI", "0") == "1" else None
@@ -916,76 +941,118 @@ class VideoSearchService:
     async def search_videos(query: str, max_results: int = 5, sources: List[str] = ["youtube", "twitter"]) -> Dict[str, Any]:
         """
         Search for videos related to the query from multiple sources
+        WITH TIMEOUT PROTECTION to prevent crashes
         """
         try:
-            results = {
+            # Wrap entire search in timeout to prevent hanging
+            async def _search_with_timeout():
+                results = {
+                    "query": query,
+                    "total_results": 0,
+                    "videos": [],
+                    "sources_searched": sources,
+                    "search_timestamp": datetime.now().isoformat()
+                }
+
+                # Search YouTube if included in sources (with timeout)
+                if "youtube" in sources and YOUTUBE_API_KEY:
+                    try:
+                        youtube_results = await asyncio.wait_for(
+                            VideoSearchService.search_youtube(query, max_results // 2),
+                            timeout=5.0
+                        )
+                        results["videos"].extend(youtube_results)
+                    except asyncio.TimeoutError:
+                        print(f"YouTube API search timed out")
+                    except Exception as e:
+                        print(f"YouTube API search failed: {e}")
+
+                # Search Twitter if included in sources (with timeout)
+                if "twitter" in sources and TWITTER_BEARER_TOKEN:
+                    try:
+                        twitter_results = await asyncio.wait_for(
+                            VideoSearchService.search_twitter_videos(query, max_results // 2),
+                            timeout=5.0
+                        )
+                        results["videos"].extend(twitter_results)
+                    except asyncio.TimeoutError:
+                        print(f"Twitter API search timed out")
+                    except Exception as e:
+                        print(f"Twitter API search failed: {e}")
+
+                # Try to get real YouTube videos (with shorter timeout and skip validation)
+                if len(results["videos"]) < max_results:
+                    try:
+                        # Use faster method without validation to avoid timeout
+                        real_youtube_videos = await asyncio.wait_for(
+                            VideoSearchService.get_real_youtube_videos_fast(query, max_results),
+                            timeout=8.0
+                        )
+                        results["videos"].extend(real_youtube_videos)
+                    except asyncio.TimeoutError:
+                        print(f"Real YouTube video search timed out")
+                    except Exception as e:
+                        print(f"Real YouTube video search failed: {e}")
+
+                # Use enhanced web scraping only if we still need more videos
+                if len(results["videos"]) < max_results:
+                    try:
+                        real_videos = await asyncio.wait_for(
+                            VideoSearchService.search_real_videos_web_scraping(query, max_results - len(results["videos"])),
+                            timeout=8.0
+                        )
+                        results["videos"].extend(real_videos)
+                    except asyncio.TimeoutError:
+                        print(f"Web scraping video search timed out")
+                    except Exception as e:
+                        print(f"Real video search failed: {e}")
+
+                # If still no videos found, use working videos
+                if len(results["videos"]) == 0:
+                    print(f"Using working videos for query: {query}")
+                    working_videos = VideoSearchService.generate_working_videos(query, max_results)
+                    results["videos"].extend(working_videos)
+
+                # Remove duplicates based on URL
+                unique_videos = []
+                seen_urls = set()
+                for video in results["videos"]:
+                    video_url = video.get("url", "")
+                    if video_url and video_url not in seen_urls:
+                        seen_urls.add(video_url)
+                        unique_videos.append(video)
+
+                results["videos"] = unique_videos
+
+                # Sort by relevance score if available
+                results["videos"] = sorted(results["videos"],
+                                         key=lambda x: x.get("relevance_score", 0),
+                                         reverse=True)[:max_results]
+
+                results["total_results"] = len(results["videos"])
+
+                return results
+
+            # Execute search with overall timeout of 20 seconds
+            return await asyncio.wait_for(_search_with_timeout(), timeout=20.0)
+
+        except asyncio.TimeoutError:
+            # Return mock data if search times out
+            print(f"Video search timed out for query: {query}")
+            mock_videos = VideoSearchService.generate_working_videos(query, max_results)
+            return {
                 "query": query,
-                "total_results": 0,
-                "videos": [],
+                "total_results": len(mock_videos),
+                "videos": mock_videos,
                 "sources_searched": sources,
-                "search_timestamp": datetime.now().isoformat()
+                "search_timestamp": datetime.now().isoformat(),
+                "fallback_used": True,
+                "timeout": True
             }
-
-            # Search YouTube if included in sources
-            if "youtube" in sources and YOUTUBE_API_KEY:
-                try:
-                    youtube_results = await VideoSearchService.search_youtube(query, max_results // 2)
-                    results["videos"].extend(youtube_results)
-                except Exception as e:
-                    print(f"YouTube API search failed: {e}")
-
-            # Search Twitter if included in sources
-            if "twitter" in sources and TWITTER_BEARER_TOKEN:
-                try:
-                    twitter_results = await VideoSearchService.search_twitter_videos(query, max_results // 2)
-                    results["videos"].extend(twitter_results)
-                except Exception as e:
-                    print(f"Twitter API search failed: {e}")
-
-            # Try to get real, validated YouTube videos first
-            try:
-                real_youtube_videos = await VideoSearchService.get_real_youtube_videos(query, max_results)
-                results["videos"].extend(real_youtube_videos)
-            except Exception as e:
-                print(f"Real YouTube video search failed: {e}")
-
-            # Use enhanced web scraping for additional real videos
-            try:
-                real_videos = await VideoSearchService.search_real_videos_web_scraping(query, max_results)
-                results["videos"].extend(real_videos)
-            except Exception as e:
-                print(f"Real video search failed: {e}")
-
-            # If still no videos found, use working videos
-            if len(results["videos"]) == 0:
-                print(f"Using working videos for query: {query}")
-                working_videos = VideoSearchService.generate_working_videos(query, max_results)
-                results["videos"].extend(working_videos)
-
-            # Remove duplicates based on URL
-            unique_videos = []
-            seen_urls = set()
-            for video in results["videos"]:
-                video_url = video.get("url", "")
-                if video_url and video_url not in seen_urls:
-                    seen_urls.add(video_url)
-                    unique_videos.append(video)
-
-            results["videos"] = unique_videos
-
-            # Sort by relevance score if available
-            results["videos"] = sorted(results["videos"],
-                                     key=lambda x: x.get("relevance_score", 0),
-                                     reverse=True)[:max_results]
-
-            results["total_results"] = len(results["videos"])
-
-            return results
-
         except Exception as e:
             # Return mock data even if everything fails
             print(f"Video search completely failed: {e}")
-            mock_videos = VideoSearchService.generate_mock_videos(query, max_results)
+            mock_videos = VideoSearchService.generate_working_videos(query, max_results)
             return {
                 "query": query,
                 "total_results": len(mock_videos),
@@ -1703,8 +1770,73 @@ class VideoSearchService:
             return False
 
     @staticmethod
+    async def get_real_youtube_videos_fast(query: str, max_results: int = 5) -> List[Dict[str, Any]]:
+        """Get real YouTube videos WITHOUT validation (faster, prevents timeout crashes)"""
+        try:
+            videos = []
+            search_url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
+
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            }
+
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                response = await client.get(search_url, headers=headers)
+
+                if response.status_code == 200:
+                    content = response.text
+
+                    # Look for video data in the page (multiple patterns)
+                    video_patterns = [
+                        r'"videoId":"([^"]+)"[^}]*"title":{"runs":\[{"text":"([^"]+)"',
+                        r'"videoId":"([^"]+)"[^}]*"title":{"simpleText":"([^"]+)"',
+                        r'watch\?v=([a-zA-Z0-9_-]{11})'
+                    ]
+
+                    seen_ids = set()
+                    for pattern in video_patterns:
+                        matches = re.findall(pattern, content)
+                        for match in matches:
+                            if len(videos) >= max_results:
+                                break
+                            
+                            if isinstance(match, tuple):
+                                video_id = match[0]
+                                title = match[1] if len(match) > 1 else f"Video about {query}"
+                            else:
+                                video_id = match
+                                title = f"Video about {query}"
+
+                            if video_id and video_id not in seen_ids:
+                                seen_ids.add(video_id)
+                                video_info = {
+                                    "source": "youtube",
+                                    "video_id": video_id,
+                                    "title": title[:100],  # Limit title length
+                                    "description": f"YouTube video about {query}",
+                                    "thumbnail": f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg",
+                                    "channel": "YouTube Channel",
+                                    "url": f"https://www.youtube.com/watch?v={video_id}",
+                                    "embed_url": f"https://www.youtube.com/embed/{video_id}",
+                                    "relevance_score": 0.85,
+                                    "real_video": True
+                                }
+                                videos.append(video_info)
+
+            return videos[:max_results]
+
+        except Exception as e:
+            print(f"Fast YouTube video search failed: {e}")
+            return []
+
+    @staticmethod
     async def get_real_youtube_videos(query: str, max_results: int = 5) -> List[Dict[str, Any]]:
-        """Get real, validated YouTube videos using web scraping"""
+        """Get real, validated YouTube videos using web scraping (slower, with validation)"""
         try:
             videos = []
             search_url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
@@ -6159,11 +6291,40 @@ async def unified_news_workflow(request: Dict[str, Any]):
         # Choose appropriate sources
         sources = ["youtube"] if content_source == "twitter" else ["youtube", "twitter"]
 
-        video_result = await VideoSearchService.search_videos(
-            query=search_query,
-            max_results=3,
-            sources=sources
-        )
+        # Wrap video search in timeout to prevent crashes
+        try:
+            video_result = await asyncio.wait_for(
+                VideoSearchService.search_videos(
+                    query=search_query,
+                    max_results=3,
+                    sources=sources
+                ),
+                timeout=25.0  # 25 second timeout for entire video search
+            )
+        except asyncio.TimeoutError:
+            print(f"Video search timed out, using fallback videos")
+            # Use fallback videos if search times out
+            video_result = {
+                "query": search_query,
+                "total_results": 0,
+                "videos": VideoSearchService.generate_working_videos(search_query, 3),
+                "sources_searched": sources,
+                "search_timestamp": datetime.now().isoformat(),
+                "timeout": True,
+                "fallback_used": True
+            }
+        except Exception as e:
+            print(f"Video search error: {e}, using fallback videos")
+            # Use fallback videos on any error
+            video_result = {
+                "query": search_query,
+                "total_results": 0,
+                "videos": VideoSearchService.generate_working_videos(search_query, 3),
+                "sources_searched": sources,
+                "search_timestamp": datetime.now().isoformat(),
+                "error": str(e),
+                "fallback_used": True
+            }
 
         workflow_result["processing_time"]["video_search"] = round(time.time() - start_time, 2)
         workflow_result["workflow_steps"].append("video_search")
