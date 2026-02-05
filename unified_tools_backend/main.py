@@ -6276,51 +6276,77 @@ async def unified_news_workflow(request: Dict[str, Any]):
         # Step 5: Video Search for Sidebar with improved context
         start_time = time.time()
 
-        # Detect content source and create contextual search
-        content_source = await VideoSearchService.detect_content_source(
-            url, main_article.get("content", "")
-        )
-
+        # Simplified video search with aggressive timeout to prevent crashes
         base_query = main_article.get("title", "") or summary[:50]
-        search_query = await VideoSearchService.get_contextual_video_search_query(
-            content_source, base_query, main_article.get("content", "")
-        )
+        
+        print(f"Sidebar video search - Query: {base_query[:100]}")
 
-        print(f"Sidebar video search - Source: {content_source}, Query: {search_query}")
-
-        # Choose appropriate sources
-        sources = ["youtube"] if content_source == "twitter" else ["youtube", "twitter"]
-
-        # Wrap video search in timeout to prevent crashes
+        # Wrap video search in very short timeout to prevent deployment crashes
         try:
+            # Try to detect source and get contextual query
+            try:
+                content_source = await asyncio.wait_for(
+                    VideoSearchService.detect_content_source(url, main_article.get("content", "")),
+                    timeout=2.0
+                )
+                search_query = await asyncio.wait_for(
+                    VideoSearchService.get_contextual_video_search_query(
+                        content_source, base_query, main_article.get("content", "")
+                    ),
+                    timeout=2.0
+                )
+                sources = ["youtube"] if content_source == "twitter" else ["youtube", "twitter"]
+            except:
+                # Fallback to simple query if context detection fails
+                search_query = base_query
+                sources = ["youtube"]
+                content_source = "news"
+            
+            # Try video search with short timeout
             video_result = await asyncio.wait_for(
                 VideoSearchService.search_videos(
                     query=search_query,
                     max_results=3,
                     sources=sources
                 ),
-                timeout=25.0  # 25 second timeout for entire video search
+                timeout=8.0  # 8 second timeout for video search
             )
         except asyncio.TimeoutError:
-            print(f"Video search timed out, using fallback videos")
-            # Use fallback videos if search times out
+            print(f"Video search timed out, using simple fallback")
+            # Use simple fallback videos
             video_result = {
-                "query": search_query,
-                "total_results": 0,
-                "videos": VideoSearchService.generate_working_videos(search_query, 3),
-                "sources_searched": sources,
+                "query": base_query,
+                "total_results": 3,
+                "videos": [
+                    {
+                        "title": f"Related: {base_query[:50]}",
+                        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+                        "source": "youtube",
+                        "duration": "3:32"
+                    }
+                ],
+                "sources_searched": ["youtube"],
                 "search_timestamp": datetime.now().isoformat(),
                 "timeout": True,
                 "fallback_used": True
             }
         except Exception as e:
-            print(f"Video search error: {e}, using fallback videos")
-            # Use fallback videos on any error
+            print(f"Video search error: {e}, using simple fallback")
+            # Use simple fallback on any error
             video_result = {
-                "query": search_query,
-                "total_results": 0,
-                "videos": VideoSearchService.generate_working_videos(search_query, 3),
-                "sources_searched": sources,
+                "query": base_query,
+                "total_results": 1,
+                "videos": [
+                    {
+                        "title": f"News: {base_query[:50]}",
+                        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+                        "source": "youtube",
+                        "duration": "3:32"
+                    }
+                ],
+                "sources_searched": [],
                 "search_timestamp": datetime.now().isoformat(),
                 "error": str(e),
                 "fallback_used": True
