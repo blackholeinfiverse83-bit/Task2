@@ -44,6 +44,8 @@ app.add_middleware(
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
+        "https://blackhole-infiverse-frontend.vercel.app",  # Vercel deployment
+        "https://blackholeinfiverse-project-blackhole-frontend.onrender.com",  # Render frontend (if deployed)
         "null",  # For file:// origins
         "*"  # Allow all origins for development
     ],
