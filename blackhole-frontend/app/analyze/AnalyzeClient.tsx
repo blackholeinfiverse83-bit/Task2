@@ -95,9 +95,9 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
     }
   }, [])
 
-  const loadFeedVideos = () => {
+  const loadFeedVideos = async () => {
     try {
-      const savedNews = getSavedNews()
+      const savedNews = await getSavedNews()
       const allVideos: Array<{
         title: string
         url: string
