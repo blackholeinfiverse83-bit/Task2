@@ -93,7 +93,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
     return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('embed')
   }
 
-  // Load YouTube IFrame API
+  // Load YouTube IFrame API with reduced warnings
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -115,6 +115,8 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
 
     const tag = document.createElement('script')
     tag.src = 'https://www.youtube.com/iframe_api'
+    tag.async = true
+    tag.defer = true
     const firstScriptTag = document.getElementsByTagName('script')[0]
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
 
@@ -156,7 +158,10 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
           modestbranding: 1,
           rel: 0,
           showinfo: 0,
-          iv_load_policy: 3
+          iv_load_policy: 3,
+          fs: 0,
+          cc_load_policy: 0,
+          disablekb: 1
         },
         events: {
           onReady: (event: any) => {

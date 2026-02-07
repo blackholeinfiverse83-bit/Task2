@@ -1,5 +1,206 @@
 [
   {
+    "id": "scraped_1770446402504_g4utt0dvc",
+    "title": "Trump removes video with racist clip depicting Obamas as apes",
+    "description": "Trump removes video with racist clip depicting Obamas as apes 5 hours ago Share Save Bernd Debusmann Jr at the White House Share Save Watch: Trump ...",
+    "url": "https://www.bbc.com/news/articles/ce8r8y78g10o",
+    "source": "Bbc",
+    "category": "general",
+    "imageUrl": "https://img.youtube.com/vi/4kI-usDUR_Q/mqdefault.jpg",
+    "publishedAt": "Just now",
+    "readTime": "6 min read",
+    "scrapedAt": "2026-02-07T06:40:02.504Z",
+    "scrapedData": {
+      "url": "https://www.bbc.com/news/articles/ce8r8y78g10o",
+      "timestamp": "2026-02-07T12:10:00.128785",
+      "workflow_steps": [
+        "scraping",
+        "vetting",
+        "summarization",
+        "prompt_generation",
+        "video_search"
+      ],
+      "processing_time": {
+        "scraping": 0.19,
+        "vetting": 0,
+        "summarization": 0.93,
+        "prompt_generation": 0.25,
+        "video_search": 0.99
+      },
+      "scraped_data": {
+        "title": "Trump removes video with racist clip depicting Obamas as apes",
+        "content_length": 5786,
+        "author": {},
+        "date": ""
+      },
+      "vetting_results": {
+        "authenticity_score": 86,
+        "credibility_rating": "High",
+        "is_reliable": true,
+        "reliability_status": "Reliable",
+        "authenticity_level": "HIGH",
+        "recommendation": "Credible news source",
+        "confidence": 0.85,
+        "analysis_details": {
+          "content_analysis": {
+            "overall_score": 95,
+            "method": "enhanced_rule_based",
+            "factual_phrases": 1,
+            "quotes": 26,
+            "word_count": 976,
+            "sensational_flags": 0
+          },
+          "source_credibility": {
+            "score": 90
+          },
+          "bias_detection": {
+            "score": 90,
+            "bias_level": "OBJECTIVE",
+            "bias_indicators": {
+              "left_bias": 0,
+              "right_bias": 1,
+              "sensationalist": 0,
+              "objective": 1
+            },
+            "sentiment": "neutral"
+          }
+        },
+        "scoring_breakdown": {
+          "source_credibility": 22.5,
+          "content_analysis": 38,
+          "cross_verification": 12,
+          "bias_analysis": 13.5
+        },
+        "analyzed_at": "2026-02-07T12:10:00.318189",
+        "analysis_version": "working_v3.0"
+      },
+      "summary": {
+        "text": "Trump removes video with racist clip depicting Obamas as apes 5 hours ago Share Save Bernd Debusmann Jr at the White House Share Save Watch: Trump ...",
+        "original_length": 5786,
+        "summary_length": 150,
+        "compression_ratio": 2.6
+      },
+      "video_prompt": {
+        "prompt": "Analyze the News summary: Trump removes video with racist clip depicting Obamas as apes with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
+        "for_video_creation": true,
+        "based_on_summary": true
+      },
+      "ai_video_generation": {
+        "success": false,
+        "error": "name 'AIVideoGenerationService' is not defined",
+        "fallback_available": true
+      },
+      "sidebar_videos": {
+        "videos": [
+          {
+            "source": "youtube",
+            "video_id": "4kI-usDUR_Q",
+            "title": "Video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+            "description": "YouTube video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/4kI-usDUR_Q/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "url": "https://www.youtube.com/watch?v=4kI-usDUR_Q",
+            "embed_url": "https://www.youtube.com/embed/4kI-usDUR_Q",
+            "relevance_score": 0.85,
+            "real_video": true
+          },
+          {
+            "source": "youtube",
+            "video_id": "zI2W5D-dSp8",
+            "title": "Video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+            "description": "YouTube video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/zI2W5D-dSp8/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "url": "https://www.youtube.com/watch?v=zI2W5D-dSp8",
+            "embed_url": "https://www.youtube.com/embed/zI2W5D-dSp8",
+            "relevance_score": 0.85,
+            "real_video": true
+          },
+          {
+            "source": "youtube",
+            "video_id": "wOFBH3H6a1U",
+            "title": "Video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+            "description": "YouTube video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+            "thumbnail": "https://img.youtube.com/vi/wOFBH3H6a1U/mqdefault.jpg",
+            "channel": "YouTube Channel",
+            "url": "https://www.youtube.com/watch?v=wOFBH3H6a1U",
+            "embed_url": "https://www.youtube.com/embed/wOFBH3H6a1U",
+            "relevance_score": 0.85,
+            "real_video": true
+          }
+        ],
+        "total_found": 3,
+        "ready_for_playback": true
+      },
+      "total_processing_time": 2.36,
+      "workflow_complete": true,
+      "steps_completed": 5
+    },
+    "summary": "Trump removes video with racist clip depicting Obamas as apes 5 hours ago Share Save Bernd Debusmann Jr at the White House Share Save Watch: Trump ...",
+    "insights": {
+      "authenticity_score": 86,
+      "credibility_rating": "High",
+      "is_reliable": true,
+      "reliability_status": "Reliable",
+      "authenticity_level": "HIGH",
+      "recommendation": "Credible news source",
+      "confidence": 0.85,
+      "analysis_details": {
+        "content_analysis": {
+          "overall_score": 95,
+          "method": "enhanced_rule_based",
+          "factual_phrases": 1,
+          "quotes": 26,
+          "word_count": 976,
+          "sensational_flags": 0
+        },
+        "source_credibility": {
+          "score": 90
+        },
+        "bias_detection": {
+          "score": 90,
+          "bias_level": "OBJECTIVE",
+          "bias_indicators": {
+            "left_bias": 0,
+            "right_bias": 1,
+            "sensationalist": 0,
+            "objective": 1
+          },
+          "sentiment": "neutral"
+        }
+      },
+      "scoring_breakdown": {
+        "source_credibility": 22.5,
+        "content_analysis": 38,
+        "cross_verification": 12,
+        "bias_analysis": 13.5
+      },
+      "analyzed_at": "2026-02-07T12:10:00.318189",
+      "analysis_version": "working_v3.0"
+    },
+    "relatedVideos": [
+      {
+        "title": "Video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+        "url": "https://www.youtube.com/watch?v=4kI-usDUR_Q",
+        "thumbnail": "https://img.youtube.com/vi/4kI-usDUR_Q/mqdefault.jpg",
+        "source": "youtube"
+      },
+      {
+        "title": "Video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+        "url": "https://www.youtube.com/watch?v=zI2W5D-dSp8",
+        "thumbnail": "https://img.youtube.com/vi/zI2W5D-dSp8/mqdefault.jpg",
+        "source": "youtube"
+      },
+      {
+        "title": "Video about Trump removes video with racist clip depicting Obamas as apes news coverage analysis",
+        "url": "https://www.youtube.com/watch?v=wOFBH3H6a1U",
+        "thumbnail": "https://img.youtube.com/vi/wOFBH3H6a1U/mqdefault.jpg",
+        "source": "youtube"
+      }
+    ],
+    "storedAt": "2026-02-07T06:40:02.513Z"
+  },
+  {
     "id": "scraped_1764741025703_xxfmdcfe4",
     "title": "Airbus to inspect some planes over 'quality issue' with panels",
     "description": "Airbus to inspect some planes over 'quality issue' with panels 3 hours ago Share Save Josh Martin and Osmond Chia Share Save Getty Images The Airbu...",
@@ -848,175 +1049,5 @@
       }
     ],
     "storedAt": "2025-11-21T06:41:51.075Z"
-  },
-  {
-    "id": "scraped_1763534617793_26szz1xta",
-    "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
-    "description": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet 6 hours ago Share Save Jessica Parker, Berlin correspondent, Bal...",
-    "url": "https://www.bbc.com/news/articles/cz91dk0l50no",
-    "source": "Bbc",
-    "category": "general",
-    "imageUrl": "https://img.youtube.com/vi/vuaXEt6_c5o/mqdefault.jpg",
-    "publishedAt": "Just now",
-    "readTime": "10 min read",
-    "scrapedAt": "2025-11-19T06:43:37.793Z",
-    "scrapedData": {
-      "url": "https://www.bbc.com/news/articles/cz91dk0l50no",
-      "timestamp": "2025-11-19T12:13:06.724547",
-      "workflow_steps": [
-        "scraping",
-        "vetting",
-        "summarization",
-        "prompt_generation",
-        "video_search"
-      ],
-      "processing_time": {
-        "scraping": 1.09,
-        "vetting": 0,
-        "summarization": 2.39,
-        "prompt_generation": 1.37,
-        "video_search": 26.22
-      },
-      "scraped_data": {
-        "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
-        "content_length": 9699,
-        "author": {},
-        "date": ""
-      },
-      "vetting_results": {
-        "authenticity_score": 86,
-        "credibility_rating": "High",
-        "is_reliable": true,
-        "reliability_status": "Reliable",
-        "authenticity_level": "HIGH",
-        "recommendation": "Credible news source",
-        "confidence": 0.85,
-        "analysis_details": {
-          "content_analysis": {
-            "overall_score": 95,
-            "method": "enhanced_rule_based",
-            "factual_phrases": 1,
-            "quotes": 31,
-            "word_count": 1575,
-            "sensational_flags": 0
-          },
-          "source_credibility": {
-            "score": 90
-          },
-          "bias_detection": {
-            "score": 90,
-            "bias_level": "OBJECTIVE",
-            "bias_indicators": {
-              "left_bias": 0,
-              "right_bias": 0,
-              "sensationalist": 0,
-              "objective": 2
-            },
-            "sentiment": "neutral"
-          }
-        },
-        "scoring_breakdown": {
-          "source_credibility": 22.5,
-          "content_analysis": 38,
-          "cross_verification": 12,
-          "bias_analysis": 13.5
-        },
-        "analyzed_at": "2025-11-19T12:13:07.810624",
-        "analysis_version": "working_v3.0"
-      },
-      "summary": {
-        "text": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet 6 hours ago Share Save Jessica Parker, Berlin correspondent, Bal...",
-        "original_length": 9699,
-        "summary_length": 150,
-        "compression_ratio": 1.5
-      },
-      "video_prompt": {
-        "prompt": "Analyze the News summary: On the front line of Europe's standoff with Russia's sanction-busting shadow fleet with a informative tone and professional style. Provide a medium analysis that includes key insights, supporting evidence, and clear conclusions.",
-        "for_video_creation": true,
-        "based_on_summary": true
-      },
-      "ai_video_generation": {
-        "success": false,
-        "error": "name 'AIVideoGenerationService' is not defined",
-        "fallback_available": true
-      },
-      "sidebar_videos": {
-        "videos": [
-          {
-            "source": "youtube",
-            "video_id": "vuaXEt6_c5o",
-            "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
-            "description": "YouTube video about On the front line of Europe's standoff with Russia's sanction-busting shadow fleet news coverage analysis",
-            "thumbnail": "https://img.youtube.com/vi/vuaXEt6_c5o/mqdefault.jpg",
-            "channel": "YouTube Channel",
-            "duration": "Unknown",
-            "views": "Unknown",
-            "published_at": "2025-11-19T12:13:33.276191",
-            "url": "https://www.youtube.com/watch?v=vuaXEt6_c5o",
-            "embed_url": "https://www.youtube.com/embed/vuaXEt6_c5o",
-            "relevance_score": 0.9,
-            "scraped": true,
-            "real_video": true
-          }
-        ],
-        "total_found": 1,
-        "ready_for_playback": true
-      },
-      "total_processing_time": 31.07,
-      "workflow_complete": true,
-      "steps_completed": 5
-    },
-    "summary": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet 6 hours ago Share Save Jessica Parker, Berlin correspondent, Bal...",
-    "insights": {
-      "authenticity_score": 86,
-      "credibility_rating": "High",
-      "is_reliable": true,
-      "reliability_status": "Reliable",
-      "authenticity_level": "HIGH",
-      "recommendation": "Credible news source",
-      "confidence": 0.85,
-      "analysis_details": {
-        "content_analysis": {
-          "overall_score": 95,
-          "method": "enhanced_rule_based",
-          "factual_phrases": 1,
-          "quotes": 31,
-          "word_count": 1575,
-          "sensational_flags": 0
-        },
-        "source_credibility": {
-          "score": 90
-        },
-        "bias_detection": {
-          "score": 90,
-          "bias_level": "OBJECTIVE",
-          "bias_indicators": {
-            "left_bias": 0,
-            "right_bias": 0,
-            "sensationalist": 0,
-            "objective": 2
-          },
-          "sentiment": "neutral"
-        }
-      },
-      "scoring_breakdown": {
-        "source_credibility": 22.5,
-        "content_analysis": 38,
-        "cross_verification": 12,
-        "bias_analysis": 13.5
-      },
-      "analyzed_at": "2025-11-19T12:13:07.810624",
-      "analysis_version": "working_v3.0"
-    },
-    "relatedVideos": [
-      {
-        "title": "On the front line of Europe's standoff with Russia's sanction-busting shadow fleet",
-        "url": "https://www.youtube.com/watch?v=vuaXEt6_c5o",
-        "thumbnail": "https://img.youtube.com/vi/vuaXEt6_c5o/mqdefault.jpg",
-        "duration": "Unknown",
-        "source": "youtube"
-      }
-    ],
-    "storedAt": "2025-11-19T06:43:38.058Z"
   }
 ]

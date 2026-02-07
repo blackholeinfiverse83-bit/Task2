@@ -241,31 +241,21 @@ class APIService {
    * Helper method to handle API calls with fallback to mock data
    */
   async fetchWithFallback(endpoint, options = {}) {
-    // Always try real backend first unless explicitly set to mock
     if (!this.useMockData || !this.backendChecked) {
       try {
         const url = `${API_BASE_URL}${endpoint}`
         const method = options.method || 'GET'
-
-        // Build security headers
-        const secureHeaders = await buildSecureHeaders(url, method, options.body ? JSON.parse(options.body) : null)
 
         const response = await fetch(url, {
           ...options,
           headers: {
             'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'true',
-            ...secureHeaders,
             ...options.headers,
           },
         })
 
         if (!response.ok) {
-          // Check for auth errors
-          if (response.status === 401 || response.status === 403) {
-            console.error('Authentication error:', response.status)
-            throw new Error(`Authentication failed: ${response.status}`)
-          }
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 
@@ -280,7 +270,6 @@ class APIService {
       }
     }
 
-    // Use mock data
     return this.getMockResponse(endpoint)
   }
 
@@ -313,6 +302,23 @@ class APIService {
    */
   async getNews(filters = {}) {
     const { category, status, limit } = filters;
+
+    // Try real backend
+    if (!this.useMockData) {
+      try {
+        const queryParams = new URLSearchParams();
+        if (category && category !== 'all') queryParams.append('category', category);
+        if (status) queryParams.append('status', status);
+        if (limit) queryParams.append('limit', limit.toString());
+
+        const endpoint = `/api/news${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+        const result = await this.fetchWithFallback(endpoint);
+        if (result && result.success) return result;
+      } catch (error) {
+        console.warn('Real news fetch failed, falling back to mock:', error);
+      }
+    }
+
     let data = [...MOCK_NEWS_DATA];
 
     // Apply filters
@@ -338,7 +344,7 @@ class APIService {
    * Get single processed news item by ID
    */
   async getProcessedNews(id) {
-    const result = await this.fetchWithFallback(`/processed/${id}`);
+    const result = await this.fetchWithFallback(`/api/processed/${id}`);
     return result;
   }
 
@@ -346,7 +352,7 @@ class APIService {
    * Get audio for news item
    */
   async getAudio(id) {
-    const result = await this.fetchWithFallback(`/audio/${id}`);
+    const result = await this.fetchWithFallback(`/api/audio/${id}`);
     return result;
   }
 
@@ -365,7 +371,7 @@ class APIService {
     this.storeFeedbackLocally(payload);
 
     // Send to API
-    const result = await this.fetchWithFallback('/feedback', {
+    const result = await this.fetchWithFallback('/api/feedback', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
@@ -404,6 +410,18 @@ class APIService {
    * Get categories
    */
   async getCategories() {
+    if (!this.useMockData) {
+      const result = await this.fetchWithFallback('/api/categories');
+      if (result && result.success) {
+        // Map backend format to UI format
+        const formatted = Object.entries(result.counts || {}).map(([id, count]) => ({
+          id,
+          name: id.charAt(0).toUpperCase() + id.slice(1),
+          count
+        }));
+        return { success: true, data: [{ id: 'all', name: 'All News', count: result.total || 0 }, ...formatted] };
+      }
+    }
     return {
       success: true,
       data: MOCK_CATEGORIES
@@ -414,6 +432,9 @@ class APIService {
    * Get pipeline status for news item
    */
   async getPipelineStatus(id) {
+    if (!this.useMockData) {
+      return await this.getProcessedNews(id);
+    }
     const news = MOCK_NEWS_DATA.find(item => item.id === id);
     if (news) {
       return {

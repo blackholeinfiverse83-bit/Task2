@@ -74,14 +74,10 @@ export default function NewsFeed() {
     }
     window.addEventListener('storage', handleStorageUpdate)
 
-    // Also check periodically for changes (in case same tab adds articles)
-    const refreshInterval = setInterval(() => {
-      loadNewsFeed()
-    }, 3000)
+    // Removed auto-refresh to prevent deleted articles from reappearing
 
     return () => {
       clearInterval(interval)
-      clearInterval(refreshInterval)
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('storage', handleStorageUpdate)
       window.removeEventListener('newsArticleSaved', handleNewsSaved as EventListener)
@@ -98,69 +94,26 @@ export default function NewsFeed() {
   }
 
   const loadNewsFeed = async () => {
-    // Try to load from Sankalp first
-    let sankalpItems: NewsItem[] = []
+    console.log('🔄 loadNewsFeed called')
+    // Load only from server file
+    let articles: NewsItem[] = []
     try {
-      console.log('📰 Loading from Sankalp...')
-      const sankalpFeed = await getSankalpFeed()
-      sankalpItems = sankalpFeed.items.map((item: SankalpItem) => {
-        const newsItem = {
-          id: item.id || `item-${Date.now()}-${Math.random()}`,
-          title: typeof item.title === 'string' ? item.title : (typeof item.script === 'string' ? item.script.substring(0, 100) : 'Untitled'),
-          description: typeof item.script === 'string' ? item.script : (item.summary_medium || item.summary_short || ''),
-          url: item.id || '', // Use id as URL since it's URL-based
-          source: extractSourceFromUrl(item.id || ''),
-          category: item.category || 'general',
-          publishedAt: item.timestamp ? formatTimeAgo(item.timestamp) : 'Recently',
-          readTime: item.audio_duration ? `${Math.ceil(item.audio_duration)}s audio` : undefined,
-          // Sankalp fields
-          script: typeof item.script === 'string' ? item.script : '',
-          tone: typeof item.tone === 'string' ? item.tone : '',
-          audio_path: typeof item.audio_path === 'string' ? item.audio_path : '',
-          priority_score: typeof item.priority_score === 'number' ? item.priority_score : 0,
-          trend_score: typeof item.trend_score === 'number' ? item.trend_score : 0,
-          audio_duration: typeof item.audio_duration === 'number' ? item.audio_duration : 0,
-          isScraped: false // Mark as from Sankalp
-        }
-        // Final safety check - ensure title and description are strings
-        if (typeof newsItem.title !== 'string') newsItem.title = 'Untitled'
-        if (typeof newsItem.description !== 'string') newsItem.description = ''
-        return newsItem
-      })
-      console.log('✅ Sankalp feed loaded:', sankalpItems.length, 'items')
-    } catch (error) {
-      console.warn('⚠️ Failed to load Sankalp feed:', error)
-    }
-
-    // Load saved scraped articles from localStorage (fallback)
-    const savedArticles = getSavedNews()
-    console.log('📰 Loading saved articles:', {
-      savedArticlesCount: savedArticles.length
-    })
-    const localScraped = mapSavedItemsToNews(savedArticles)
-
-    let serverScraped: NewsItem[] = []
-    try {
+      console.log('📰 Fetching from /api/scraped-news...')
       const response = await fetch('/api/scraped-news')
+      console.log('📰 Response status:', response.status)
       if (response.ok) {
         const data = await response.json()
+        console.log('📰 Response data:', data)
         if (Array.isArray(data?.data)) {
-          serverScraped = mapSavedItemsToNews(data.data as SavedNewsItem[])
+          articles = mapSavedItemsToNews(data.data as SavedNewsItem[])
+          console.log('📰 Mapped articles:', articles.length)
         }
       }
     } catch (error) {
-      console.warn('Failed to load server-saved articles:', error)
+      console.warn('❌ Failed to load articles:', error)
     }
 
-    // Merge: Sankalp items first (highest priority), then scraped
-    const scrapedNews = mergeByUrl([...serverScraped, ...localScraped])
-    const allNews = mergeByUrl([...sankalpItems, ...scrapedNews])
-
-    console.log('📰 Total news loaded:', {
-      sankalpCount: sankalpItems.length,
-      scrapedCount: scrapedNews.length,
-      totalCount: allNews.length
-    })
+    console.log('📰 Total news loaded:', articles.length)
 
     // Sample news items - in production, this would come from an API
     const sampleNews: NewsItem[] = [
@@ -299,8 +252,7 @@ export default function NewsFeed() {
     ]
 
 
-    // If we have Sankalp items or scraped items, use them; otherwise use sample news as fallback
-    const finalNews = allNews.length > 0 ? allNews : sampleNews
+    const finalNews = articles.length > 0 ? articles : sampleNews
 
     // CRITICAL: Sanitize all items to ensure they have valid title and description
     const sanitizedNews = finalNews.map(item => ({
@@ -353,17 +305,26 @@ export default function NewsFeed() {
     handleAnalyzeArticle(news.url)
   }
 
-  const handleRemoveArticle = (id: string, e: React.MouseEvent) => {
+  const handleRemoveArticle = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (confirm('Remove this article from your feed?')) {
-      const updated = newsItems.filter(item => item.id !== id)
-      setNewsItems(updated)
-
-      // Also remove from localStorage if it's a scraped article
-      if (newsItems.find(item => item.id === id)?.isScraped) {
-        removeSavedNews(id)
-        // Reload to ensure consistency
-        loadNewsFeed()
+    console.log('🗑️ Delete button clicked for:', id)
+    if (confirm('Remove this article permanently?')) {
+      try {
+        console.log('🗑️ Sending DELETE request to /api/scraped-news?id=' + id)
+        const response = await fetch(`/api/scraped-news?id=${id}`, { method: 'DELETE' })
+        console.log('🗑️ DELETE response status:', response.status)
+        const result = await response.json()
+        console.log('🗑️ DELETE response body:', result)
+        
+        console.log('🗑️ Updating UI state, removing article:', id)
+        setNewsItems(prev => {
+          const filtered = prev.filter(item => item.id !== id)
+          console.log('🗑️ Articles before:', prev.length, 'after:', filtered.length)
+          return filtered
+        })
+        console.log('✅ Article deletion complete')
+      } catch (error) {
+        console.error('❌ Failed to delete:', error)
       }
     }
   }

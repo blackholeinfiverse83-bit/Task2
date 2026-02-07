@@ -8,9 +8,10 @@ import TTSPlayer from '@/components/TTSPlayer'
 import PipelineViewer from '@/components/PipelineViewer'
 import AIInsights from '@/components/AIInsights'
 import FeedbackPanel from '@/components/FeedbackPanel'
-import { checkBackendHealth } from '@/lib/api'
+import { checkBackendHealth, getDetailedPipelineStatus } from '@/lib/api'
 import apiService from '@/services/api'
 import { Filter, LayoutGrid } from 'lucide-react'
+import { useWebSocket } from '@/hooks/useWebSocket'
 
 export default function LiveDashboard() {
   const [backendStatus, setBackendStatus] = useState<'online' | 'offline' | 'checking'>('checking')
@@ -20,11 +21,64 @@ export default function LiveDashboard() {
   const [categories, setCategories] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
+  // WebSocket Integration
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3002'
+  const { lastMessage } = useWebSocket(wsUrl)
+
+  useEffect(() => {
+    if (lastMessage) {
+      const { type, data } = lastMessage
+      console.log('📡 Live Dashboard WS Message:', type, data)
+
+      if (type === 'bhiv_status_update' || type === 'news_published') {
+        const newsId = data.newsItemId || data.id
+
+        // Update the list
+        setNewsItems(prevItems => prevItems.map(item => {
+          if (item.id === newsId || item._id === newsId) {
+            return {
+              ...item,
+              status: data.status || item.status,
+              // If we have more detailed info, update it
+              ...data.article
+            }
+          }
+          return item
+        }))
+
+        // Update selected item if it's the one that changed
+        if (selectedItem && (selectedItem.id === newsId || selectedItem._id === newsId)) {
+          // If it's a major update, we might want to refetch or just patch
+          setSelectedItem((prev: any) => ({
+            ...prev,
+            status: data.status || prev.status,
+            ...data.article
+          }))
+
+          // Also fetch detailed pipeline status to update PipelineViewer
+          fetchDetailedStatus(newsId)
+        }
+      }
+    }
+  }, [lastMessage])
+
+  const fetchDetailedStatus = async (id: string) => {
+    const status = await getDetailedPipelineStatus(id)
+    if (status && status.success) {
+      setSelectedItem((prev: any) => {
+        if (prev && (prev.id === id || prev._id === id)) {
+          return { ...prev, pipeline: status.pipeline }
+        }
+        return prev
+      })
+    }
+  }
+
   useEffect(() => {
     checkBackend()
     loadCategories()
     loadNews()
-    
+
     const interval = setInterval(checkBackend, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -56,11 +110,11 @@ export default function LiveDashboard() {
   const loadNews = async () => {
     setIsLoading(true)
     try {
-      const result = await apiService.getNews({ 
+      const result = await apiService.getNews({
         category: selectedCategory,
         limit: 20
       })
-      
+
       if (result.success) {
         setNewsItems(result.data)
         // Auto-select first item if none selected
@@ -75,13 +129,36 @@ export default function LiveDashboard() {
     }
   }
 
-  const handleItemSelect = (item: any) => {
-    setSelectedItem(item)
+  const handleFeedbackSubmit = async (type: string, response?: any) => {
+    console.log('📝 Feedback submitted:', type, response)
+
+    // Update the selected item immediately with the Reward or new stats if provided
+    if (selectedItem && response) {
+      setSelectedItem((prev: any) => ({
+        ...prev,
+        feedback: {
+          ...prev.feedback,
+          likes: type === 'like' ? (prev.feedback?.likes || 0) + 1 : (prev.feedback?.likes || 0),
+          skips: type === 'skip' ? (prev.feedback?.skips || 0) + 1 : (prev.feedback?.skips || 0),
+          flags: type === 'flag' ? (prev.feedback?.flags || 0) + 1 : (prev.feedback?.flags || 0),
+        },
+        // Update reward/score if returned by RL loop
+        priority_score: response.reward !== undefined ? response.reward : prev.priority_score
+      }))
+    }
   }
 
-  const handleFeedbackSubmit = (type: string) => {
-    console.log('Feedback submitted:', type)
-    // Optionally refresh the item or update UI
+  const handleItemSelect = async (item: any) => {
+    setSelectedItem(item)
+    // Fetch full details if item is from a list (which might be partial)
+    try {
+      const fullItem = await apiService.getProcessedNews(item.id)
+      if (fullItem && fullItem.success) {
+        setSelectedItem(fullItem.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch full news details:', error)
+    }
   }
 
   return (
@@ -121,11 +198,10 @@ export default function LiveDashboard() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                    : 'bg-black/40 text-gray-300 hover:bg-black/60 border border-white/10'
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${selectedCategory === category.id
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                  : 'bg-black/40 text-gray-300 hover:bg-black/60 border border-white/10'
+                  }`}
               >
                 {category.name}
                 <span className="ml-2 text-xs opacity-70">({category.count})</span>
@@ -169,7 +245,7 @@ export default function LiveDashboard() {
                       )}
                     </div>
                   </div>
-                  
+
                   {selectedItem.url && (
                     <a
                       href={selectedItem.url}

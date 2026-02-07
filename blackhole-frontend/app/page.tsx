@@ -141,33 +141,15 @@ export default function Home() {
       }
     }
 
-    // Load saved scraped articles from localStorage (fallback)
-    const savedArticles = getSavedNews()
-    console.log('📰 Loading saved articles:', {
-      savedArticlesCount: savedArticles.length
-    })
+    // Load saved scraped articles from file
+    const savedArticles = await getSavedNews()
     const localScraped = mapSavedItemsToNews(savedArticles)
-
-    let serverScraped: NewsItem[] = []
-    try {
-      const response = await fetch('/api/scraped-news')
-      if (response.ok) {
-        const data = await response.json()
-        if (Array.isArray(data?.data)) {
-          serverScraped = mapSavedItemsToNews(data.data as SavedNewsItem[])
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to load server-saved articles:', error)
-    }
-
-    // Merge: Sankalp items first (highest priority), then scraped
-    const scrapedNews = mergeByUrl([...serverScraped, ...localScraped])
-    const allNews = mergeByUrl([...sankalpItems, ...scrapedNews])
+    // Merge: Sankalp items first, then scraped
+    const allNews = mergeByUrl([...sankalpItems, ...localScraped])
 
     console.log('📰 Total news loaded:', {
       sankalpCount: sankalpItems.length,
-      scrapedCount: scrapedNews.length,
+      scrapedCount: localScraped.length,
       totalCount: allNews.length
     })
 
@@ -323,7 +305,11 @@ export default function Home() {
       publishedAt: String(item.publishedAt || 'Recently'),
     }))
 
-    setNewsItems(sanitizedNews)
+    // Filter out deleted articles
+    const deleted = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
+    const filtered = sanitizedNews.filter(item => !deleted.includes(item.id))
+
+    setNewsItems(filtered)
   }
 
   const categories = [
@@ -362,18 +348,18 @@ export default function Home() {
     handleAnalyzeArticle(news.url)
   }
 
-  const handleRemoveArticle = (id: string, e: React.MouseEvent) => {
+  const handleRemoveArticle = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (confirm('Remove this article from your feed?')) {
-      const updated = newsItems.filter(item => item.id !== id)
-      setNewsItems(updated)
-
-      // Also remove from localStorage if it's a scraped article
-      if (newsItems.find(item => item.id === id)?.isScraped) {
-        removeSavedNews(id)
-        // Reload to ensure consistency
-        loadNewsFeed()
+      setNewsItems(newsItems.filter(item => item.id !== id))
+      const article = newsItems.find(item => item.id === id)
+      if (article?.isScraped) {
+        await removeSavedNews(id)
       }
+      // Store deleted IDs to filter them out on reload
+      const deleted = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
+      deleted.push(id)
+      localStorage.setItem('deleted_articles', JSON.stringify(deleted))
     }
   }
 
@@ -400,15 +386,19 @@ export default function Home() {
           </p>
           <div className="mt-4">
             <button
-              onClick={() => {
-                if (confirm('Are you sure you want to clear all saved news data? This cannot be undone.')) {
-                  localStorage.removeItem('scraped_news_articles')
+              onClick={async () => {
+                if (confirm('Clear all saved news?')) {
+                  const articles = await getSavedNews()
+                  for (const article of articles) {
+                    await removeSavedNews(article.id)
+                  }
+                  localStorage.removeItem('deleted_articles')
                   window.location.reload()
                 }
               }}
               className="text-xs text-red-400 hover:text-red-300 underline"
             >
-              Clear Saved Data (Fix Errors)
+              Clear All Saved Data
             </button>
           </div>
         </div>
@@ -497,7 +487,7 @@ export default function Home() {
                       {news.category || 'general'}
                     </span>
                     {/* Sankalp scores */}
-                    {news.priority_score !== undefined && (
+                    {news.priority_score !== undefined && news.priority_score > 0 && (
                       <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full" title="Priority Score">
                         ⭐ {Math.round(news.priority_score * 100)}%
                       </span>
@@ -511,15 +501,16 @@ export default function Home() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-500">{news.publishedAt}</span>
-                    {news.isScraped && (
-                      <button
-                        onClick={(e) => handleRemoveArticle(news.id, e)}
-                        className="p-1 hover:bg-red-500/20 rounded transition-colors"
-                        title="Remove from feed"
-                      >
-                        <Trash2 className="w-3 h-3 text-red-400" />
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        console.log('🗑️ Delete button clicked for:', news.id, news.title)
+                        handleRemoveArticle(news.id, e)
+                      }}
+                      className="p-1 hover:bg-red-500/20 rounded transition-colors"
+                      title="Remove from feed"
+                    >
+                      <Trash2 className="w-3 h-3 text-red-400" />
+                    </button>
                   </div>
                 </div>
 
