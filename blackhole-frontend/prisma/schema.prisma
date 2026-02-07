@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ScrapedNews {
+  id             String   @id @default(uuid())
+  customId       String   @unique // The 'id' field from your JSON
+  title          String
+  description    String
+  url            String   @unique
+  source         String
+  category       String
+  imageUrl       String?
+  publishedAt    String
+  readTime       String?
+  scrapedAt      String
+  scrapedData    Json?
+  summary        String?
+  insights       Json?
+  relatedVideos  Json?
+  storedAt       String?  // Keeping as string to match your JSON format
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

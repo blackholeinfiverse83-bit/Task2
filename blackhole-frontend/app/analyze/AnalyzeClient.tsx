@@ -24,14 +24,14 @@ interface AnalysisResults {
     [key: string]: any
   }
   summary?:
-    | {
-        text?: string
-        original_length?: number
-        summary_length?: number
-        compression_ratio?: number
-        [key: string]: any
-      }
-    | string
+  | {
+    text?: string
+    original_length?: number
+    summary_length?: number
+    compression_ratio?: number
+    [key: string]: any
+  }
+  | string
   video_prompt?: {
     prompt?: string
     for_video_creation?: boolean
@@ -98,6 +98,14 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
   const loadFeedVideos = async () => {
     try {
       const savedNews = await getSavedNews()
+
+      // Defensive check: ensure we have an array
+      if (!savedNews || !Array.isArray(savedNews)) {
+        console.warn('getSavedNews did not return an array:', savedNews)
+        setFeedVideos([])
+        return
+      }
+
       const allVideos: Array<{
         title: string
         url: string
@@ -139,6 +147,7 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
       setFeedVideos(allVideos)
     } catch (error) {
       console.error('Error loading feed videos:', error)
+      setFeedVideos([])
     }
   }
 
@@ -361,14 +370,14 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
               videos={
                 analysisResults
                   ? (analysisResults?.sidebar_videos?.videos || [])
-                      .filter(video => video && video.title && video.source)
-                      .map(video => ({
-                        title: video.title!,
-                        url: video.url || '',
-                        thumbnail: video.thumbnail,
-                        duration: video.duration,
-                        source: video.source!,
-                      }))
+                    .filter(video => video && video.title && video.source)
+                    .map(video => ({
+                      title: video.title!,
+                      url: video.url || '',
+                      thumbnail: video.thumbnail,
+                      duration: video.duration,
+                      source: video.source!,
+                    }))
                   : feedVideos
               }
               title={analysisResults ? 'Related Videos' : feedVideos.length > 0 ? 'News Feed Videos' : 'Demo Videos'}
