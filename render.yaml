@@ -34,7 +34,7 @@ services:
     plan: free
     branch: master
     rootDir: blackhole-frontend
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
