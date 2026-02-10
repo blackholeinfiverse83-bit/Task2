@@ -45,13 +45,13 @@ npm start
 
 ## 🔧 Environment Variables You Need
 
-| Variable | Where to Get It |
-|----------|----------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Already in your `.env.local` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Already in your `.env.local` |
-| `DATABASE_URL` | Already in your `.env.local` |
-| `NEXT_PUBLIC_NOOPUR_API_BASE` | Your deployed backend URL or `http://localhost:3001` |
-| `NEXT_PUBLIC_SANKALP_API_BASE` | Your deployed backend URL or `http://localhost:3002` |
+| Variable                          | Where to Get It                                        |
+| --------------------------------- | ------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Already in your `.env.local`                         |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Already in your `.env.local`                         |
+| `DATABASE_URL`                  | Already in your `.env.local`                         |
+| `NEXT_PUBLIC_NOOPUR_API_BASE`   | Your deployed backend URL or `http://localhost:3001` |
+| `NEXT_PUBLIC_SANKALP_API_BASE`  | Your deployed backend URL or `http://localhost:3002` |
 
 ---
 
@@ -133,11 +133,11 @@ git push origin main
 
 ## 💰 Pricing Quick Reference
 
-| Plan | Cost | Features |
-|------|------|----------|
-| **Free** | $0 | 750 hrs/month, spins down after 15 min |
-| **Starter** | $7/mo | Always on, 512 MB RAM |
-| **Standard** | $25/mo | 2 GB RAM, priority support |
+| Plan               | Cost   | Features                               |
+| ------------------ | ------ | -------------------------------------- |
+| **Free**     | $0     | 750 hrs/month, spins down after 15 min |
+| **Starter**  | $7/mo  | Always on, 512 MB RAM                  |
+| **Standard** | $25/mo | 2 GB RAM, priority support             |
 
 **Recommendation:** Start with Free, upgrade Frontend to Starter ($7) when ready for production.
 

@@ -21,6 +21,7 @@ Complete guide for deploying the News AI Frontend to production environments.
 ### 1. Vercel (Recommended)
 
 #### Why Vercel?
+
 - Zero configuration deployment
 - Automatic HTTPS
 - Global CDN
@@ -30,16 +31,19 @@ Complete guide for deploying the News AI Frontend to production environments.
 #### Steps:
 
 1. **Install Vercel CLI**
+
 ```bash
 npm install -g vercel
 ```
 
 2. **Login to Vercel**
+
 ```bash
 vercel login
 ```
 
 3. **Deploy**
+
 ```bash
 # Preview deployment
 vercel
@@ -51,12 +55,14 @@ vercel --prod
 4. **Configure Environment Variables**
 
 In Vercel Dashboard:
+
 - Go to Project Settings → Environment Variables
 - Add:
   - `NEXT_PUBLIC_API_BASE_URL` = Your backend URL
   - Any other required variables
 
 5. **Custom Domain** (Optional)
+
 - Go to Project Settings → Domains
 - Add your custom domain
 - Update DNS records as instructed
@@ -68,16 +74,19 @@ In Vercel Dashboard:
 #### Steps:
 
 1. **Install Netlify CLI**
+
 ```bash
 npm install -g netlify-cli
 ```
 
 2. **Build the project**
+
 ```bash
 npm run build
 ```
 
 3. **Deploy**
+
 ```bash
 netlify deploy --prod
 ```
@@ -85,6 +94,7 @@ netlify deploy --prod
 4. **Configuration**
 
 Create `netlify.toml`:
+
 ```toml
 [build]
   command = "npm run build"
@@ -103,6 +113,7 @@ Create `netlify.toml`:
 #### Dockerfile
 
 Create `Dockerfile`:
+
 ```dockerfile
 # Build stage
 FROM node:18-alpine AS builder
@@ -143,6 +154,7 @@ CMD ["npm", "start"]
 #### Docker Compose
 
 Create `docker-compose.yml`:
+
 ```yaml
 version: '3.8'
 
@@ -165,6 +177,7 @@ services:
 ```
 
 #### Deploy:
+
 ```bash
 # Build image
 docker build -t news-ai-frontend .
@@ -185,11 +198,13 @@ docker-compose up -d
 #### Option A: AWS Amplify
 
 1. **Connect Repository**
+
 - Go to AWS Amplify Console
 - Connect your GitHub repository
 - Configure build settings
 
 2. **Build Settings**
+
 ```yaml
 version: 1
 frontend:
@@ -212,16 +227,19 @@ frontend:
 #### Option B: AWS EC2
 
 1. **Launch EC2 Instance**
+
 - Choose Ubuntu 22.04 LTS
 - t3.small or larger
 - Configure security groups (allow ports 80, 443, 22)
 
 2. **SSH into Instance**
+
 ```bash
 ssh -i your-key.pem ubuntu@your-ec2-ip
 ```
 
 3. **Install Dependencies**
+
 ```bash
 # Update system
 sudo apt update && sudo apt upgrade -y
@@ -235,6 +253,7 @@ sudo npm install -g pm2
 ```
 
 4. **Deploy Application**
+
 ```bash
 # Clone repository
 git clone your-repo-url
@@ -253,6 +272,7 @@ pm2 startup
 ```
 
 5. **Setup Nginx Reverse Proxy**
+
 ```bash
 sudo apt install nginx
 
@@ -284,6 +304,7 @@ sudo systemctl restart nginx
 ```
 
 6. **SSL with Let's Encrypt**
+
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
@@ -296,11 +317,13 @@ sudo certbot --nginx -d your-domain.com
 #### Cloud Run Deployment
 
 1. **Install gcloud CLI**
+
 ```bash
 # Follow instructions at https://cloud.google.com/sdk/docs/install
 ```
 
 2. **Build and Deploy**
+
 ```bash
 # Set project
 gcloud config set project your-project-id
@@ -324,16 +347,19 @@ gcloud run deploy news-ai-frontend \
 #### Azure Static Web Apps
 
 1. **Install Azure CLI**
+
 ```bash
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 ```
 
 2. **Login**
+
 ```bash
 az login
 ```
 
 3. **Deploy**
+
 ```bash
 az staticwebapp create \
   --name news-ai-frontend \
@@ -354,6 +380,7 @@ az staticwebapp create \
 **Never commit sensitive data!**
 
 Create `.env.production`:
+
 ```env
 NEXT_PUBLIC_API_BASE_URL=https://api.your-domain.com
 # Add other non-sensitive public variables
@@ -364,6 +391,7 @@ For sensitive server-side variables, use your hosting provider's environment var
 ### CORS Configuration
 
 Ensure backend allows your frontend domain:
+
 ```python
 # Python backend example
 ALLOWED_ORIGINS = [
@@ -375,6 +403,7 @@ ALLOWED_ORIGINS = [
 ### HTTPS
 
 Always use HTTPS in production:
+
 - Vercel/Netlify: Automatic
 - Custom server: Use Let's Encrypt or your provider's SSL
 
@@ -385,6 +414,7 @@ Always use HTTPS in production:
 ### 1. Image Optimization
 
 Use Next.js Image component:
+
 ```tsx
 import Image from 'next/image'
 
@@ -400,6 +430,7 @@ import Image from 'next/image'
 ### 2. Code Splitting
 
 Next.js handles this automatically, but you can optimize further:
+
 ```tsx
 import dynamic from 'next/dynamic'
 
@@ -412,6 +443,7 @@ const DynamicComponent = dynamic(() => import('./Component'), {
 ### 3. Caching
 
 Configure caching in `next.config.js`:
+
 ```javascript
 module.exports = {
   async headers() {
@@ -441,6 +473,7 @@ npm install @sentry/nextjs
 ```
 
 `sentry.config.js`:
+
 ```javascript
 import * as Sentry from "@sentry/nextjs";
 
@@ -453,6 +486,7 @@ Sentry.init({
 ### 2. Analytics (Google Analytics)
 
 Add to `app/layout.tsx`:
+
 ```tsx
 import Script from 'next/script'
 
@@ -465,6 +499,7 @@ import Script from 'next/script'
 ### 3. Performance Monitoring
 
 Use Vercel Analytics or Lighthouse CI:
+
 ```bash
 npm install -D @vercel/analytics
 ```
@@ -505,6 +540,7 @@ artillery quick --count 10 --num 100 http://localhost:3000
 ### GitHub Actions Example
 
 `.github/workflows/deploy.yml`:
+
 ```yaml
 name: Deploy to Production
 
@@ -515,26 +551,26 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+  
     steps:
       - uses: actions/checkout@v2
-      
+  
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '18'
-          
+      
       - name: Install dependencies
         run: npm ci
-        
+    
       - name: Run tests
         run: npm test
-        
+    
       - name: Build
         run: npm run build
         env:
           NEXT_PUBLIC_API_BASE_URL: ${{ secrets.API_BASE_URL }}
-          
+      
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -577,6 +613,7 @@ npm run build
 ### Runtime Errors
 
 Check logs:
+
 - Vercel: View deployment logs in dashboard
 - Docker: `docker logs container-name`
 - PM2: `pm2 logs news-ai-frontend`
@@ -593,6 +630,7 @@ Check logs:
 ## 📞 Support
 
 For deployment issues:
+
 1. Check documentation
 2. Review error logs
 3. Contact DevOps team
@@ -601,4 +639,3 @@ For deployment issues:
 ---
 
 **Deployment guide last updated: November 2024**
-
