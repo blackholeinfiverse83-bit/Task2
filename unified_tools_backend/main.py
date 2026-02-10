@@ -91,6 +91,115 @@ BLACKHOLE_LLM_MODEL = os.getenv("BLACKHOLE_LLM_MODEL", "llama3.1")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
 
+# Helper Functions
+
+def generate_brief_description(summary: str, content: str, title: str) -> str:
+    """
+    Generate a brief 1-2 sentence description from summary or content.
+    This is displayed below the video player on the news feed page.
+    """
+    # Use summary if available
+    text_source = summary if summary and len(summary) > 50 else content
+    
+    if not text_source or len(text_source) < 50:
+        return f"News article about {title}" if title else "News article"
+    
+    # Clean up the text
+    text = text_source.strip()
+    
+    # Try to extract the first 1-2 sentences (up to 200 characters)
+    # Look for sentence endings
+    sentences = []
+    current = ""
+    
+    for char in text:
+        current += char
+        if char in '.!?' and len(current) > 50:
+            sentences.append(current.strip())
+            current = ""
+            if len(sentences) >= 2:
+                break
+    
+    # If we couldn't find sentence endings, just truncate
+    if not sentences:
+        brief = text[:200].strip()
+        if len(text) > 200:
+            brief += "..."
+        return brief
+    
+    # Join sentences (max 2)
+    brief = " ".join(sentences[:2])
+    
+    # Ensure it's not too long
+    if len(brief) > 300:
+        brief = brief[:297] + "..."
+    
+    return brief
+
+def detect_news_category(title: str, content: str) -> str:
+    """
+    Detect news category based on title and content keywords.
+    Returns one of: sports, entertainment, politics, technology, business, 
+    science, health, environment, education, crime, or general
+    """
+    text = (title + " " + content[:1000]).lower()
+    
+    # Define category patterns with keywords
+    categories = {
+        'sports': [
+            r'\b(sports?|football|soccer|basketball|baseball|tennis|cricket|rugby|hockey|golf|olympics?|athlete|match|game|team|player|championship|tournament|league|score|win|goal|sporting|nfl|nba|mlb|nhl|fifa|uefa|ipl|match)\b'
+        ],
+        'entertainment': [
+            r'\b(entertainment|movie|film|cinema|actor|actress|celebrity|music|album|song|concert|hollywood|bollywood|show|series|tv|television|netflix|streaming|performance|award|red carpet|premiere)\b'
+        ],
+        'politics': [
+            r'\b(politics?|political|election|vote|voting|government|minister|prime minister|president|parliament|congress|senate|policy|law|legislation|party|democrat|republican|campaign|candidate|politician|diplomacy|international relations|brexit|trade war|summit)\b'
+        ],
+        'technology': [
+            r'\b(tech|technology|software|ai|artificial intelligence|computer|digital|internet|app|startup|gadget|device|smartphone|iphone|android|cyber|data|programming|coding|robot|automation|blockchain|crypto|bitcoin|innovation|tech company)\b'
+        ],
+        'business': [
+            r'\b(business|economy|economic|market|stock|finance|financial|investment|investor|company|corporate|ceo|startup|entrepreneur|trade|commerce|industry|manufacturing|revenue|profit|loss|earnings|gdp|inflation|recession|banking|bank)\b'
+        ],
+        'science': [
+            r'\b(science|scientific|research|study|discovery|space|nasa|mars|moon|astronomy|physics|chemistry|biology|experiment|scientist|laboratory|dna|gene|climate|environment|renewable|energy|solar|wind|nuclear|quantum)\b'
+        ],
+        'health': [
+            r'\b(health|medical|medicine|healthcare|doctor|hospital|clinic|patient|disease|illness|virus|pandemic|vaccine|treatment|cure|surgery|mental health|wellness|fitness|nutrition|diet|exercise|cancer|diabetes|covid)\b'
+        ],
+        'crime': [
+            r'\b(crime|criminal|police|arrest|murder|theft|robbery|assault|investigation|court|trial|lawyer|judge|sentence|prison|jail|fraud|scam|corruption|illegal|drug|weapon|gun|shooting|violence|victim|suspect)\b'
+        ],
+        'environment': [
+            r'\b(environment|climate change|global warming|pollution|carbon|emissions|green|sustainable|renewable|energy|solar|wind|recycling|conservation|wildlife|nature|forest|ocean|weather|disaster|flood|earthquake|hurricane)\b'
+        ],
+        'education': [
+            r'\b(education|school|university|college|student|teacher|professor|academic|study|research|exam|test|grade|degree|scholarship|learning|campus|admission|enrollment|curriculum|online learning|e-learning)\b'
+        ],
+        'travel': [
+            r'\b(travel|tourism|tourist|vacation|holiday|trip|journey|flight|airline|airport|hotel|resort|destination|passport|visa|booking|destination|adventure|explore|wanderlust|backpacking)\b'
+        ],
+        'food': [
+            r'\b(food|cuisine|restaurant|chef|cooking|recipe|meal|dish|flavor|taste|dining|gastronomy|organic|vegan|vegetarian|diet|nutrition|culinary|bakery|cafe|bar)\b'
+        ]
+    }
+    
+    # Count matches for each category
+    scores = {}
+    for category, patterns in categories.items():
+        score = 0
+        for pattern in patterns:
+            matches = re.findall(pattern, text)
+            score += len(matches)
+        if score > 0:
+            scores[category] = score
+    
+    # Return the category with highest score, or 'general' if no matches
+    if scores:
+        return max(scores.items(), key=lambda x: x[1])[0]
+    
+    return 'general'
+
 # Pydantic models
 class ScrapingRequest(BaseModel):
     url: str
@@ -6159,11 +6268,19 @@ async def unified_news_workflow(request: Dict[str, Any]):
 
         # The scraping service returns a single article object directly
         main_article = scraped_data
+        
+        # Detect category based on article content
+        detected_category = detect_news_category(
+            main_article.get("title", ""),
+            main_article.get("content", "")
+        )
+        
         workflow_result["scraped_data"] = {
             "title": main_article.get("title", ""),
             "content_length": len(main_article.get("content", "")),
             "author": main_article.get("author", ""),
-            "date": main_article.get("date", "")
+            "date": main_article.get("date", ""),
+            "category": detected_category
         }
 
         # Step 2: Vetting/Authenticity Check
@@ -6249,6 +6366,10 @@ async def unified_news_workflow(request: Dict[str, Any]):
             "summary_length": len(summary),
             "compression_ratio": round((len(summary) / len(content_to_summarize)) * 100, 1) if content_to_summarize else 0
         }
+
+        # Generate brief description for article display (1-2 sentences)
+        brief_description = generate_brief_description(summary, content_to_summarize, main_article.get("title", ""))
+        workflow_result["brief_description"] = brief_description
 
         # Step 4: AI Video Prompt Generation
         start_time = time.time()

@@ -1,24 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Loader2, Lock, Mail, ArrowRight, UserPlus, Check, X } from 'lucide-react'
-import Header from '@/components/Header'
+import { Loader2, Lock, Mail, ArrowRight, UserPlus, Check, X, User } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
 
 export default function SignupPage() {
     const router = useRouter()
+    const { signup, isAuthenticated } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [name, setName] = useState('')
     const [acceptTerms, setAcceptTerms] = useState(false)
     const [error, setError] = useState('')
+    const [success, setSuccess] = useState(false)
     const [fieldErrors, setFieldErrors] = useState({
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        name: ''
     })
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push('/')
+        }
+    }, [isAuthenticated, router])
 
     // Password strength validation
     const getPasswordStrength = (pwd: string) => {
@@ -40,8 +51,14 @@ export default function SignupPage() {
     const passwordStrength = getPasswordStrength(password)
 
     const validateForm = () => {
-        const errors = { email: '', password: '', confirmPassword: '' }
+        const errors = { email: '', password: '', confirmPassword: '', name: '' }
         let isValid = true
+
+        // Name validation
+        if (!name.trim()) {
+            errors.name = 'Name is required'
+            isValid = false
+        }
 
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -90,18 +107,65 @@ export default function SignupPage() {
 
         setIsLoading(true)
 
-        // Mock signup for now (will be connected to backend later)
-        setTimeout(() => {
-            // Successful signup simulation
-            localStorage.setItem('jwt_token', 'mock_token_' + Date.now())
-            router.push('/')
-        }, 1500)
+        try {
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password, name })
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                setSuccess(true)
+            } else {
+                setError(data.error || 'Failed to create account. Please try again.')
+            }
+        } catch {
+            setError('An error occurred during signup. Please try again.')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    if (success) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-black to-pink-900/10"></div>
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] animate-pulse"></div>
+                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+
+                    <div className="w-full max-w-md relative z-10">
+                        <div className="glass-effect p-8 rounded-2xl border border-white/10 shadow-2xl text-center">
+                            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                <Check className="w-8 h-8 text-white" />
+                            </div>
+                            <h1 className="text-3xl font-bold text-white mb-2">Account Created!</h1>
+                            <p className="text-gray-400 mb-4">
+                                We&apos;ve sent a verification email to <strong>{email}</strong>
+                            </p>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Please check your inbox and click the verification link to activate your account.
+                            </p>
+                            <Link
+                                href="/login"
+                                className="inline-flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl transition-all"
+                            >
+                                <span>Go to Login</span>
+                                <ArrowRight className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        )
     }
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header backendStatus="online" />
-
             <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
                 {/* Background Effects */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-black to-pink-900/10"></div>
@@ -124,6 +188,31 @@ export default function SignupPage() {
                                     {error}
                                 </div>
                             )}
+
+                            {/* Name Field */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-300 ml-1">Full Name</label>
+                                <div className="relative">
+                                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => {
+                                            setName(e.target.value)
+                                            setFieldErrors({ ...fieldErrors, name: '' })
+                                        }}
+                                        className={`w-full bg-black/50 border ${fieldErrors.name ? 'border-red-500/50' : 'border-white/10'
+                                            } rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                                        placeholder="John Doe"
+                                    />
+                                </div>
+                                {fieldErrors.name && (
+                                    <p className="text-xs text-red-400 ml-1 flex items-center gap-1">
+                                        <X className="w-3 h-3" />
+                                        {fieldErrors.name}
+                                    </p>
+                                )}
+                            </div>
 
                             {/* Email Field */}
                             <div className="space-y-2">
@@ -184,12 +273,12 @@ export default function SignupPage() {
                                         <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full transition-all duration-300 ${passwordStrength.strength <= 2
-                                                        ? 'bg-red-500'
-                                                        : passwordStrength.strength <= 3
-                                                            ? 'bg-yellow-500'
-                                                            : passwordStrength.strength <= 4
-                                                                ? 'bg-blue-500'
-                                                                : 'bg-green-500'
+                                                    ? 'bg-red-500'
+                                                    : passwordStrength.strength <= 3
+                                                        ? 'bg-yellow-500'
+                                                        : passwordStrength.strength <= 4
+                                                            ? 'bg-blue-500'
+                                                            : 'bg-green-500'
                                                     }`}
                                                 style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
                                             ></div>
@@ -238,7 +327,7 @@ export default function SignupPage() {
                                 <label htmlFor="terms" className="text-sm text-gray-400">
                                     I agree to the{' '}
                                     <Link href="#" className="text-purple-400 hover:text-purple-300">
-                                        Terms & Conditions
+                                        Terms &amp; Conditions
                                     </Link>{' '}
                                     and{' '}
                                     <Link href="#" className="text-purple-400 hover:text-purple-300">

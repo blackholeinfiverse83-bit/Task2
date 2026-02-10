@@ -6,7 +6,7 @@ import Header from '@/components/Header'
 import BackendStatus from '@/components/BackendStatus'
 import { checkBackendHealth, getSankalpFeed, type SankalpItem } from '@/lib/api'
 import { getSavedNews, removeSavedNews, SavedNewsItem } from '@/lib/newsStorage'
-import { Search, Filter, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X } from 'lucide-react'
+import { Search, Filter, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X, Trophy, Landmark, Siren, Plane, UtensilsCrossed } from 'lucide-react'
 
 interface NewsItem {
   id: string
@@ -314,13 +314,18 @@ export default function Home() {
 
   const categories = [
     { id: 'all', name: 'All', icon: Globe },
+    { id: 'sports', name: 'Sports', icon: Trophy },
+    { id: 'politics', name: 'Politics', icon: Landmark },
     { id: 'technology', name: 'Technology', icon: TrendingUp },
-    { id: 'business', name: 'Business', icon: Newspaper },
+    { id: 'entertainment', name: 'Entertainment', icon: Newspaper },
+    { id: 'business', name: 'Business', icon: TrendingUp },
     { id: 'science', name: 'Science', icon: Clock },
     { id: 'health', name: 'Health', icon: Filter },
     { id: 'environment', name: 'Environment', icon: Globe },
-    { id: 'entertainment', name: 'Entertainment', icon: Newspaper },
-    { id: 'education', name: 'Education', icon: Clock }
+    { id: 'education', name: 'Education', icon: Clock },
+    { id: 'crime', name: 'Crime', icon: Siren },
+    { id: 'travel', name: 'Travel', icon: Plane },
+    { id: 'food', name: 'Food', icon: UtensilsCrossed }
   ]
 
   const filteredNews = newsItems.filter(item => {
@@ -660,6 +665,18 @@ export default function Home() {
                   </div>
                 )}
               </div>
+
+              {/* Article Description */}
+              {activeVideo.article.description && (
+                <div className="mt-6 p-4 bg-white/5 rounded-xl border border-white/10">
+                  <h4 className="text-sm font-semibold text-purple-300 uppercase tracking-wide mb-2">
+                    Article Summary
+                  </h4>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {activeVideo.article.description}
+                  </p>
+                </div>
+              )}
 
               <div className="mt-6 flex flex-wrap gap-3 justify-between">
                 <div className="text-sm text-gray-400 flex flex-col">

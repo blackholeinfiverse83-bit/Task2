@@ -1,40 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Loader2, Lock, Mail, ArrowRight, Github } from 'lucide-react'
-import Header from '@/components/Header'
+import { useAuth } from '@/lib/auth'
 
 export default function LoginPage() {
     const router = useRouter()
+    const { login, isAuthenticated } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push('/')
+        }
+    }, [isAuthenticated, router])
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError('')
 
-        // Mock login for now
-        setTimeout(() => {
-            if (email && password) {
-                // Successful login simulation
-                localStorage.setItem('jwt_token', 'mock_token_' + Date.now())
+        try {
+            const result = await login(email, password)
+            if (result.success) {
                 router.push('/')
             } else {
-                setError('Please enter both email and password')
-                setIsLoading(false)
+                setError(result.error || 'Invalid email or password. Please try again.')
             }
-        }, 1500)
+        } catch {
+            setError('An error occurred during login. Please try again.')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header backendStatus="online" />
-
             <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
                 {/* Background Effects */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-black to-pink-900/10"></div>
@@ -68,6 +75,7 @@ export default function LoginPage() {
                                         onChange={(e) => setEmail(e.target.value)}
                                         className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                         placeholder="name@company.com"
+                                        required
                                     />
                                 </div>
                             </div>
@@ -75,7 +83,7 @@ export default function LoginPage() {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center ml-1">
                                     <label className="text-sm font-medium text-gray-300">Password</label>
-                                    <Link href="#" className="text-xs text-purple-400 hover:text-purple-300">
+                                    <Link href="/forgot-password" className="text-xs text-purple-400 hover:text-purple-300">
                                         Forgot password?
                                     </Link>
                                 </div>
@@ -87,6 +95,8 @@ export default function LoginPage() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                         placeholder="••••••••"
+                                        required
+                                        minLength={6}
                                     />
                                 </div>
                             </div>

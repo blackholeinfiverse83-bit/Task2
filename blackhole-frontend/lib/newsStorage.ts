@@ -32,17 +32,22 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
       extractTitleFromUrl(url) ||
       'No title found'
 
-    const description = (typeof scrapedData.summary === 'string' ? scrapedData.summary : scrapedData.summary?.text) ||
+    const description = scrapedData.brief_description ||
+      (typeof scrapedData.summary === 'string' ? scrapedData.summary : scrapedData.summary?.text) ||
       scrapedData.scraped_data?.content?.substring(0, 200) ||
       'No description available'
 
+    // Use backend category if available, otherwise detect from content
+    const detectedCategory = scrapedData.scraped_data?.category || 
+                             detectCategory(title, description)
+    
     const newsItem: SavedNewsItem = {
       id: `scraped_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title,
       description: description.length > 200 ? description.substring(0, 200) + '...' : description,
       url,
       source: extractSourceFromUrl(url),
-      category: detectCategory(title, description),
+      category: detectedCategory,
       imageUrl: findBestImage(scrapedData, title),
       publishedAt: formatTimeAgo(scrapedData.scraped_data?.date || new Date().toISOString()),
       readTime: Math.ceil((scrapedData.scraped_data?.content_length || description.length) / 1000) + ' min read',
@@ -115,13 +120,43 @@ function extractTitleFromUrl(url: string): string {
 
 function detectCategory(title: string, description: string): string {
   const text = (title + ' ' + description).toLowerCase()
-  if (text.match(/\b(tech|ai|software|computer|digital)\b/)) return 'technology'
-  if (text.match(/\b(business|economy|market|stock|finance)\b/)) return 'business'
-  if (text.match(/\b(science|research|study|discovery)\b/)) return 'science'
-  if (text.match(/\b(health|medical|doctor|hospital)\b/)) return 'health'
-  if (text.match(/\b(climate|environment|green|carbon)\b/)) return 'environment'
-  if (text.match(/\b(entertainment|movie|music|celebrity)\b/)) return 'entertainment'
-  if (text.match(/\b(education|school|university|student)\b/)) return 'education'
+  
+  // Sports (high priority - specific match patterns)
+  if (text.match(/\b(sports?|football|soccer|basketball|baseball|tennis|cricket|rugby|hockey|golf|olympics?|athlete|match|game|team|player|championship|tournament|league|score|win|goal|nfl|nba|mlb|nhl|fifa|uefa|ipl)\b/)) return 'sports'
+  
+  // Politics
+  if (text.match(/\b(politics?|political|election|vote|voting|government|minister|prime minister|president|parliament|congress|senate|policy|law|legislation|party|democrat|republican|campaign|candidate|politician|diplomacy|brexit)\b/)) return 'politics'
+  
+  // Entertainment
+  if (text.match(/\b(entertainment|movie|film|cinema|actor|actress|celebrity|music|album|song|concert|hollywood|bollywood|show|series|tv|television|netflix|streaming|performance|award|premiere)\b/)) return 'entertainment'
+  
+  // Technology
+  if (text.match(/\b(tech|technology|software|ai|artificial intelligence|computer|digital|internet|app|startup|gadget|device|smartphone|iphone|android|cyber|data|programming|robot|automation|blockchain|crypto|bitcoin)\b/)) return 'technology'
+  
+  // Business
+  if (text.match(/\b(business|economy|economic|market|stock|finance|financial|investment|investor|company|corporate|ceo|entrepreneur|trade|commerce|industry|manufacturing|revenue|profit|loss|earnings|gdp|inflation|banking|bank)\b/)) return 'business'
+  
+  // Science
+  if (text.match(/\b(science|scientific|research|study|discovery|space|nasa|mars|moon|astronomy|physics|chemistry|biology|experiment|scientist|laboratory|dna|gene|quantum)\b/)) return 'science'
+  
+  // Health
+  if (text.match(/\b(health|medical|medicine|healthcare|doctor|hospital|clinic|patient|disease|illness|virus|pandemic|vaccine|treatment|cure|surgery|mental health|wellness|fitness|nutrition|diet|cancer|covid)\b/)) return 'health'
+  
+  // Crime
+  if (text.match(/\b(crime|criminal|police|arrest|murder|theft|robbery|assault|investigation|court|trial|lawyer|judge|sentence|prison|jail|fraud|scam|corruption|illegal|drug|weapon|gun|shooting)\b/)) return 'crime'
+  
+  // Environment
+  if (text.match(/\b(environment|climate change|global warming|pollution|carbon|emissions|green|sustainable|renewable|energy|solar|wind|recycling|conservation|wildlife|nature|forest|ocean|weather|disaster|flood|earthquake|hurricane)\b/)) return 'environment'
+  
+  // Education
+  if (text.match(/\b(education|school|university|college|student|teacher|professor|academic|study|exam|test|grade|degree|scholarship|learning|campus|admission|enrollment|curriculum)\b/)) return 'education'
+  
+  // Travel
+  if (text.match(/\b(travel|tourism|tourist|vacation|holiday|trip|journey|flight|airline|airport|hotel|resort|destination|passport|visa|booking|adventure|explore)\b/)) return 'travel'
+  
+  // Food
+  if (text.match(/\b(food|cuisine|restaurant|chef|cooking|recipe|meal|dish|flavor|taste|dining|gastronomy|organic|vegan|vegetarian|diet|nutrition|culinary|bakery|cafe)\b/)) return 'food'
+  
   return 'general'
 }
 

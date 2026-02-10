@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Activity, Clock, Users } from 'lucide-react'
+import { Menu, X, Activity, Clock, LogOut, User } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
 
 interface HeaderProps {
   backendStatus: 'online' | 'offline' | 'checking'
@@ -13,6 +14,7 @@ interface HeaderProps {
 export default function Header({ backendStatus }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { user, isAuthenticated, logout } = useAuth()
 
   const getStatusColor = () => {
     switch (backendStatus) {
@@ -43,6 +45,42 @@ export default function Header({ backendStatus }: HeaderProps) {
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/'
     return pathname.startsWith(href)
+  }
+
+  // Don't show navigation if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <header className="glass-effect border-b border-white/10">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo and Brand */}
+            <Link href="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
+              <div className="relative w-12 h-12">
+                <Image
+                  src="/infiverse-logo.svg"
+                  alt="Infiverse logo"
+                  fill
+                  className="object-contain rounded-full"
+                  priority
+                />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Blackhole Infiverse LLP</h1>
+                <p className="text-sm text-gray-400">Advanced AI Pipeline</p>
+              </div>
+            </Link>
+
+            {/* Login Button */}
+            <Link
+              href="/login"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
+            >
+              Login
+            </Link>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   return (
@@ -82,7 +120,7 @@ export default function Header({ backendStatus }: HeaderProps) {
             ))}
           </nav>
 
-          {/* Status and Stats */}
+          {/* Status and User Info */}
           <div className="hidden lg:flex items-center space-x-6">
             {/* Backend Status */}
             <div className="flex items-center space-x-2">
@@ -102,13 +140,22 @@ export default function Header({ backendStatus }: HeaderProps) {
               </div>
             </div>
 
-            {/* Login Button */}
-            <Link
-              href="/login"
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
-            >
-              Login
-            </Link>
+            {/* User Info */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
+                <User className="w-4 h-4 text-purple-400" />
+                <span className="text-sm text-gray-300">{user?.email?.split('@')[0] || 'User'}</span>
+              </div>
+              
+              {/* Logout Button */}
+              <button
+                onClick={logout}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition-all text-sm"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -138,10 +185,30 @@ export default function Header({ backendStatus }: HeaderProps) {
                 </Link>
               ))}
 
-              {/* Mobile Status */}
-              <div className="flex items-center space-x-2 pt-4 border-t border-white/10">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
-                <span className="text-sm text-gray-300">{getStatusText()}</span>
+              {/* Mobile Status & User */}
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
+                  <span className="text-sm text-gray-300">{getStatusText()}</span>
+                </div>
+                
+                {user && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-300">
+                    <User className="w-4 h-4 text-purple-400" />
+                    <span>{user.email}</span>
+                  </div>
+                )}
+                
+                <button
+                  onClick={() => {
+                    logout()
+                    setIsMenuOpen(false)
+                  }}
+                  className="flex items-center space-x-2 text-red-400 hover:text-red-300"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
               </div>
             </nav>
           </div>
