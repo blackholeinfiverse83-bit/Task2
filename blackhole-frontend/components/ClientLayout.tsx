@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { AuthProvider, useAuth } from '@/lib/auth'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import GoogleTranslate from '@/components/GoogleTranslate'
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -38,6 +39,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
+      <GoogleTranslate />
       <LayoutContent>
         {children}
       </LayoutContent>

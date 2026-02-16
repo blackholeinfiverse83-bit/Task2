@@ -77,6 +77,20 @@ export async function checkBackendHealth(): Promise<boolean> {
   }
 }
 
+/** Request TTS audio from backend (Vaani). Returns audio blob (mp3 or wav). */
+export async function fetchTTSAudio(text: string, language = 'en'): Promise<Blob> {
+  const response = await fetch(`${API_BASE}/api/tts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+    body: JSON.stringify({ text, language }),
+  })
+  if (!response.ok) {
+    const err = await response.text()
+    throw new Error(err || `TTS failed: ${response.status}`)
+  }
+  return response.blob()
+}
+
 export async function runUnifiedWorkflow(url: string): Promise<WorkflowResult> {
   try {
     console.log(`📡 Connecting to backend at: ${API_BASE}`)

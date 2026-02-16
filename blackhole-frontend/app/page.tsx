@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import BackendStatus from '@/components/BackendStatus'
-import { checkBackendHealth, getSankalpFeed, type SankalpItem } from '@/lib/api'
+import { checkBackendHealth, getSankalpFeed, fetchTTSAudio, type SankalpItem } from '@/lib/api'
+import { getCurrentTranslateLanguage, getTTSLanguageCode } from '@/lib/translate'
 import { getSavedNews, removeSavedNews, SavedNewsItem } from '@/lib/newsStorage'
-import { Search, Filter, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X, Trophy, Landmark, Siren, Plane, UtensilsCrossed } from 'lucide-react'
+import { Search, Filter, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X, Trophy, Landmark, Siren, Plane, UtensilsCrossed, Volume2, Loader2 } from 'lucide-react'
 
 interface NewsItem {
   id: string
@@ -45,6 +46,15 @@ export default function Home() {
     article: NewsItem
     video: NonNullable<NewsItem['relatedVideos']>[number]
   } | null>(null)
+  const [ttsLoading, setTtsLoading] = useState(false)
+  const ttsAudioUrlRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!activeVideo && ttsAudioUrlRef.current) {
+      URL.revokeObjectURL(ttsAudioUrlRef.current)
+      ttsAudioUrlRef.current = null
+    }
+  }, [activeVideo])
 
   useEffect(() => {
     checkBackend()
@@ -343,6 +353,38 @@ export default function Home() {
   const handleAnalyzeArticle = (url: string) => {
     // Navigate to analyze page with the URL pre-filled
     router.push(`/analyze?url=${encodeURIComponent(url)}`)
+  }
+
+  const handlePlaySummaryTTS = async () => {
+    if (!activeVideo?.article.description || ttsLoading) return
+    if (ttsAudioUrlRef.current) {
+      URL.revokeObjectURL(ttsAudioUrlRef.current)
+      ttsAudioUrlRef.current = null
+    }
+    setTtsLoading(true)
+    try {
+      const lang = getTTSLanguageCode(getCurrentTranslateLanguage())
+      const blob = await fetchTTSAudio(activeVideo.article.description, lang)
+      const url = URL.createObjectURL(blob)
+      ttsAudioUrlRef.current = url
+      const audio = new Audio(url)
+      audio.onended = () => setTtsLoading(false)
+      audio.onerror = () => {
+        setTtsLoading(false)
+        if (ttsAudioUrlRef.current) {
+          URL.revokeObjectURL(ttsAudioUrlRef.current)
+          ttsAudioUrlRef.current = null
+        }
+      }
+      await audio.play()
+    } catch (e) {
+      console.error('TTS failed:', e)
+      setTtsLoading(false)
+      if (ttsAudioUrlRef.current) {
+        URL.revokeObjectURL(ttsAudioUrlRef.current)
+        ttsAudioUrlRef.current = null
+      }
+    }
   }
 
   const handleNewsCardClick = (news: NewsItem) => {
@@ -669,9 +711,21 @@ export default function Home() {
               {/* Article Description */}
               {activeVideo.article.description && (
                 <div className="mt-6 p-4 bg-white/5 rounded-xl border border-white/10">
-                  <h4 className="text-sm font-semibold text-purple-300 uppercase tracking-wide mb-2">
-                    Article Summary
-                  </h4>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="text-sm font-semibold text-purple-300 uppercase tracking-wide">
+                      Article Summary
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={handlePlaySummaryTTS}
+                      disabled={ttsLoading}
+                      className="p-1.5 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Listen to summary"
+                      aria-label="Listen to article summary"
+                    >
+                      {ttsLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Volume2 className="w-4 h-4" />}
+                    </button>
+                  </div>
                   <p className="text-gray-300 text-sm leading-relaxed">
                     {activeVideo.article.description}
                   </p>

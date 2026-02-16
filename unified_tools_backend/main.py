@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import Response
 import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -244,6 +245,10 @@ class NewsAnalysisRequest(BaseModel):
     include_videos: bool = True
     max_video_results: int = 3
     authenticity_check: bool = True
+
+class TTSRequest(BaseModel):
+    text: str
+    language: str = "en"
 
 # Unified response model
 class UnifiedResponse(BaseModel):
@@ -5675,6 +5680,40 @@ async def root():
             }
         }
     }
+
+
+# gTTS uses specific codes (e.g. zh-cn not zh). Map our codes so gTTS is used, not pyttsx3 fallback.
+_TTS_LANG_TO_GTTS = {"zh": "zh-cn", "zh-tw": "zh-tw"}
+
+def _tts_generate(text: str, language: str) -> bytes:
+    """Run Vaani TTS (blocking); used from thread pool. Uses gTTS when possible."""
+    _vaani_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "VaaniTTS_Standalone"))
+    if _vaani_root not in sys.path:
+        sys.path.insert(0, _vaani_root)
+    from tts_service import text_to_speech_stream
+    lang = (language or "en").strip().lower()
+    lang = _TTS_LANG_TO_GTTS.get(lang, lang)  # so gTTS gets e.g. zh-cn not zh
+    translate = lang != "en"
+    return text_to_speech_stream(text, language=lang, use_google_tts=True, translate=translate)
+
+
+@app.post("/api/tts")
+async def tts_endpoint(body: TTSRequest):
+    """Convert text to speech (Vaani TTS); returns audio (mp3 or wav)."""
+    if not (body.text or "").strip():
+        raise HTTPException(status_code=400, detail="text is required")
+    try:
+        loop = asyncio.get_event_loop()
+        audio_bytes = await loop.run_in_executor(
+            None, _tts_generate, body.text.strip(), body.language or "en"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS failed: {str(e)}")
+    if not audio_bytes:
+        raise HTTPException(status_code=500, detail="TTS produced no audio")
+    media_type = "audio/wav" if audio_bytes[:4] == b"RIFF" else "audio/mpeg"
+    return Response(content=audio_bytes, media_type=media_type)
+
 
 @app.post("/api/validate-url")
 async def validate_url_endpoint(request: Dict[str, Any]):

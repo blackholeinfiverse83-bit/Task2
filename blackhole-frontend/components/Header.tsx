@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Activity, Clock, LogOut, User } from 'lucide-react'
+import { Menu, X, Activity, Clock, LogOut, User, Globe } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { SUPPORTED_LANGUAGES, getCurrentTranslateLanguage, setTranslateLanguage } from '@/lib/translate'
 
 interface HeaderProps {
   backendStatus: 'online' | 'offline' | 'checking'
@@ -13,8 +14,14 @@ interface HeaderProps {
 
 export default function Header({ backendStatus }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false)
+  const [currentLang, setCurrentLang] = useState('en')
   const pathname = usePathname()
   const { user, isAuthenticated, logout } = useAuth()
+
+  useEffect(() => {
+    setCurrentLang(getCurrentTranslateLanguage())
+  }, [])
 
   const getStatusColor = () => {
     switch (backendStatus) {
@@ -65,18 +72,47 @@ export default function Header({ backendStatus }: HeaderProps) {
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">Blackhole Infiverse LLP</h1>
-                <p className="text-sm text-gray-400">Advanced AI Pipeline</p>
+                <h1 className="text-xl font-bold text-white">Samachar</h1>
+                <p className="text-sm text-gray-400">News AI</p>
               </div>
             </Link>
 
-            {/* Login Button */}
-            <Link
-              href="/login"
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
-            >
-              Login
-            </Link>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setLangDropdownOpen((o) => !o)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-sm"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>{SUPPORTED_LANGUAGES.find((l) => l.code === currentLang)?.label ?? 'Language'}</span>
+                </button>
+                {langDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" aria-hidden="true" onClick={() => setLangDropdownOpen(false)} />
+                    <ul className="absolute right-0 top-full mt-1 py-1 w-44 rounded-lg bg-black/95 border border-white/10 shadow-xl z-20 max-h-64 overflow-auto">
+                      {SUPPORTED_LANGUAGES.map((lang) => (
+                        <li key={lang.code}>
+                          <button
+                            type="button"
+                            onClick={() => setTranslateLanguage(lang.code)}
+                            className={`w-full text-left px-4 py-2 text-sm ${currentLang === lang.code ? 'text-purple-400 bg-white/10' : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}
+                          >
+                            {lang.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+              <Link
+                href="/login"
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
+              >
+                Login
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -99,8 +135,8 @@ export default function Header({ backendStatus }: HeaderProps) {
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Blackhole Infiverse LLP</h1>
-              <p className="text-sm text-gray-400">Advanced AI Pipeline</p>
+              <h1 className="text-xl font-bold text-white">Samachar</h1>
+              <p className="text-sm text-gray-400">News AI</p>
             </div>
           </Link>
 
@@ -118,6 +154,39 @@ export default function Header({ backendStatus }: HeaderProps) {
                 {item.label}
               </Link>
             ))}
+            {/* Language dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen((o) => !o)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-sm"
+                aria-haspopup="true"
+                aria-expanded={langDropdownOpen}
+              >
+                <Globe className="w-4 h-4" />
+                <span>{SUPPORTED_LANGUAGES.find((l) => l.code === currentLang)?.label ?? 'Language'}</span>
+              </button>
+              {langDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" aria-hidden="true" onClick={() => setLangDropdownOpen(false)} />
+                  <ul className="absolute right-0 top-full mt-1 py-1 w-44 rounded-lg bg-black/95 border border-white/10 shadow-xl z-20 max-h-64 overflow-auto">
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <li key={lang.code}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTranslateLanguage(lang.code)
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentLang === lang.code ? 'text-purple-400 bg-white/10' : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}
+                        >
+                          {lang.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
           </nav>
 
           {/* Status and User Info */}
@@ -184,6 +253,23 @@ export default function Header({ backendStatus }: HeaderProps) {
                   {item.label}
                 </Link>
               ))}
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-xs text-gray-500 mb-2">Language / Idioma</p>
+                <div className="flex flex-wrap gap-2">
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => {
+                        setTranslateLanguage(lang.code)
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm ${currentLang === lang.code ? 'bg-purple-500/30 text-purple-300' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+                    >
+                      {lang.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Mobile Status & User */}
               <div className="pt-4 border-t border-white/10 space-y-3">
