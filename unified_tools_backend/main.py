@@ -5684,9 +5684,11 @@ async def root():
 
 # gTTS uses specific codes (e.g. zh-cn not zh). Map our codes so gTTS is used, not pyttsx3 fallback.
 _TTS_LANG_TO_GTTS = {"zh": "zh-cn", "zh-tw": "zh-tw"}
+# gTTS splits into ~100-char chunks; long text = many requests = 429. Cap to reduce chunk count.
+_TTS_MAX_CHARS = 500
 
 def _tts_generate(text: str, language: str) -> bytes:
-    """Run Vaani TTS (blocking); used from thread pool. Uses gTTS when possible."""
+    """Run Vaani TTS (blocking); used from thread pool. Uses gTTS with retry on 429."""
     _vaani_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "VaaniTTS_Standalone"))
     if _vaani_root not in sys.path:
         sys.path.insert(0, _vaani_root)
@@ -5694,10 +5696,22 @@ def _tts_generate(text: str, language: str) -> bytes:
     lang = (language or "en").strip().lower()
     lang = _TTS_LANG_TO_GTTS.get(lang, lang)  # so gTTS gets e.g. zh-cn not zh
     translate = lang != "en"
-    # On server (e.g. Render) skip pyttsx3 fallback; espeak is not installed there.
-    return text_to_speech_stream(
-        text, language=lang, use_google_tts=True, translate=translate, fallback_to_pyttsx3=False
-    )
+    # Cap length to reduce gTTS chunk count and 429 risk
+    if len(text) > _TTS_MAX_CHARS:
+        text = text[: _TTS_MAX_CHARS].rsplit(maxsplit=1)[0] + "."
+    last_err = None
+    for attempt in range(3):
+        try:
+            return text_to_speech_stream(
+                text, language=lang, use_google_tts=True, translate=translate, fallback_to_pyttsx3=False
+            )
+        except Exception as e:
+            last_err = e
+            if "429" not in str(e):
+                raise
+            if attempt < 2:
+                time.sleep(5 * (attempt + 1))  # 5s, then 10s backoff
+    raise last_err
 
 
 @app.post("/api/tts")
