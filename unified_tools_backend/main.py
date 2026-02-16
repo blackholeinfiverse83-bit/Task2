@@ -5694,7 +5694,10 @@ def _tts_generate(text: str, language: str) -> bytes:
     lang = (language or "en").strip().lower()
     lang = _TTS_LANG_TO_GTTS.get(lang, lang)  # so gTTS gets e.g. zh-cn not zh
     translate = lang != "en"
-    return text_to_speech_stream(text, language=lang, use_google_tts=True, translate=translate)
+    # On server (e.g. Render) skip pyttsx3 fallback; espeak is not installed there.
+    return text_to_speech_stream(
+        text, language=lang, use_google_tts=True, translate=translate, fallback_to_pyttsx3=False
+    )
 
 
 @app.post("/api/tts")

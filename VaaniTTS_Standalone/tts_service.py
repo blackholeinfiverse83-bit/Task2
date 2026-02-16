@@ -196,9 +196,10 @@ Return ONLY the translation, nothing else."""
         return text
 
 
-def text_to_speech_stream(text, language='en', use_google_tts=True, translate=True):
+def text_to_speech_stream(text, language='en', use_google_tts=True, translate=True, fallback_to_pyttsx3=True):
     """
-    Convert text to speech and return the audio data directly
+    Convert text to speech and return the audio data directly.
+    If fallback_to_pyttsx3 is False (e.g. on server), only gTTS is used; no espeak/pyttsx3.
     """
     if not text:
         raise ValueError("Text is required")
@@ -221,6 +222,8 @@ def text_to_speech_stream(text, language='en', use_google_tts=True, translate=Tr
             if audio_data:
                 return audio_data
         except Exception as e:
+            if not fallback_to_pyttsx3:
+                raise RuntimeError(f"Google TTS failed: {e}") from e
             print(f"[TTS] Google TTS failed: {e}, falling back to pyttsx3")
             use_google_tts = False
     
