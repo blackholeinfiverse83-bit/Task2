@@ -1,145 +1,100 @@
 import { PrismaClient } from '@prisma/client'
 
-// Extend globalThis type
+// Extend globalThis type for singleton caching
 declare global {
   var prisma: PrismaClient | undefined
   var prismaNews: PrismaClient | undefined
 }
 
-// Create Prisma client for AUTH database (User, Session, etc.)
+// ============ AUTH DATABASE (User, Session, etc.) ============
+
 function createAuthPrismaClient() {
   const baseUrl = process.env.AUTH_DATABASE_URL || process.env.DATABASE_URL || ''
-
   const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
-
-  const optimizedParams = [
-    'sslmode=require',
-    'connection_limit=5',
-    'pool_timeout=30',
-    'connect_timeout=30'
-  ].join('&')
-
-  const url = `${urlWithoutParams}?${optimizedParams}`
-
-  console.log('Auth Prisma initialized (connection_limit=1)')
+  const url = `${urlWithoutParams}?sslmode=require&connection_limit=5&pool_timeout=30&connect_timeout=30`
 
   return new PrismaClient({
-    datasources: {
-      db: { url },
-    },
+    datasources: { db: { url } },
     log: ['error'],
   })
 }
 
-// Create Prisma client for NEWS database (ScrapedNews)
+// Singleton — cached in globalThis to prevent new clients on every request
+export const authPrisma = globalThis.prisma ?? createAuthPrismaClient()
+globalThis.prisma = authPrisma
+
+// ============ NEWS DATABASE (ScrapedNews) ============
+
 function createNewsPrismaClient() {
   const baseUrl = process.env.NEWS_DATABASE_URL || ''
 
   if (!baseUrl) {
-    console.warn('NEWS_DATABASE_URL is not set! News database will be unavailable.')
-    // Fall back to auth database URL – news queries may fail if ScrapedNews table doesn't exist there
-    const fallback = process.env.DATABASE_URL || process.env.AUTH_DATABASE_URL || ''
-    if (!fallback) throw new Error('No database URL available for news client')
-    return new PrismaClient({
-      datasources: { db: { url: fallback } },
-      log: ['error'],
-    })
+    console.warn('NEWS_DATABASE_URL not set — falling back to auth DB')
+    return authPrisma // reuse auth client as fallback
   }
 
-  // Strip existing query params, then re-add our connection tune params
   const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
-
-  console.log('News Prisma initialized (connection_limit=1)')
-  const optimizedParams = [
-    'sslmode=require',
-    'connection_limit=5',
-    'pool_timeout=30',
-    'connect_timeout=30'
-  ].join('&')
-
-  const url = `${urlWithoutParams}?${optimizedParams}`
-
-  console.log('News Prisma initialized (connection_limit=1)')
+  const url = `${urlWithoutParams}?sslmode=require&connection_limit=5&pool_timeout=30&connect_timeout=30`
 
   return new PrismaClient({
-    datasources: {
-      db: { url },
-    },
+    datasources: { db: { url } },
     log: ['error'],
   })
 }
 
-// Helper with aggressive retry and cleanup
-async function withRetry<T>(
-  createClient: () => PrismaClient,
+// Singleton — cached in globalThis
+export const newsPrisma = globalThis.prismaNews ?? createNewsPrismaClient()
+globalThis.prismaNews = newsPrisma
+
+// ============ HELPERS ============
+
+// Use the SINGLETON client with retry (no new clients per attempt)
+async function withClientRetry<T>(
+  client: PrismaClient,
   callback: (prisma: PrismaClient) => Promise<T>,
-  maxRetries = 5
+  maxRetries = 3
 ): Promise<T> {
   let lastError: Error | undefined
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    const client = createClient()
-
     try {
-      const result = await callback(client)
-      await client.$disconnect().catch(() => { })
-      return result
+      return await callback(client)
     } catch (error) {
       lastError = error as Error
-      await client.$disconnect().catch(() => { })
-
-      if (
-        error instanceof Error &&
-        (error.message.includes('connection pool') ||
-          error.message.includes('P2024') ||
-          error.message.includes('Timed out') ||
-          error.message.includes('P1001') ||
-          error.message.includes('P1002'))
-      ) {
-        const delay = Math.min(1000 * attempt, 5000)
-        console.log(`Connection attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms...`)
-        await new Promise(resolve => setTimeout(resolve, delay))
+      const isRetryable = error instanceof Error && (
+        error.message.includes('connection pool') ||
+        error.message.includes('Timed out') ||
+        error.message.includes('P1001') ||
+        error.message.includes('P1002') ||
+        error.message.includes('P2024')
+      )
+      if (isRetryable && attempt < maxRetries) {
+        const delay = Math.min(2000 * attempt, 8000)
+        console.log(`DB retry ${attempt}/${maxRetries} in ${delay}ms...`)
+        await new Promise(r => setTimeout(r, delay))
         continue
       }
       throw error
     }
   }
-
-  throw lastError || new Error('Database connection failed after retries')
-}
-
-// ============ AUTH DATABASE (User, Session, etc.) ============
-
-export const authPrisma = globalThis.prisma ?? createAuthPrismaClient()
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prisma = authPrisma
+  throw lastError || new Error('Database connection failed')
 }
 
 export async function withAuthPrisma<T>(
   callback: (prisma: PrismaClient) => Promise<T>,
-  maxRetries = 5
+  maxRetries = 3
 ): Promise<T> {
-  return withRetry(createAuthPrismaClient, callback, maxRetries)
-}
-
-export default authPrisma
-
-// ============ NEWS DATABASE (ScrapedNews) ============
-
-export const newsPrisma = globalThis.prismaNews ?? createNewsPrismaClient()
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prismaNews = newsPrisma
+  return withClientRetry(authPrisma, callback, maxRetries)
 }
 
 export async function withNewsPrisma<T>(
   callback: (prisma: PrismaClient) => Promise<T>,
-  maxRetries = 5
+  maxRetries = 3
 ): Promise<T> {
-  return withRetry(createNewsPrismaClient, callback, maxRetries)
+  return withClientRetry(newsPrisma, callback, maxRetries)
 }
 
-// Export for backwards compatibility
+// Backwards compatibility exports
+export default authPrisma
 export const prisma = authPrisma
 export const withPrisma = withAuthPrisma
