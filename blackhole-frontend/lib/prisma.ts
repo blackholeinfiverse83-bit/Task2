@@ -1,65 +1,62 @@
 import { PrismaClient } from '@prisma/client'
 
-const prismaClientSingleton = () => {
-  // Parse and optimize DATABASE_URL for serverless environment
+// For serverless environments (Render free tier), we need a different strategy
+// Using connection_limit=1 and creating/disposing clients per request
+// prevents pool exhaustion
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+function createPrismaClient() {
   const baseUrl = process.env.DATABASE_URL || ''
   
-  // Remove existing connection params and add optimized ones
+  // Remove existing connection params
   const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
   
-  // Build URL with optimized connection pool settings
-  // connection_limit: 10 (up from 5) - allows more concurrent connections
-  // pool_timeout: 10 (down from 30) - faster timeout = faster error detection
-  // connect_timeout: 10 - faster connection attempts
+  // For serverless: use connection_limit=1 to prevent pool exhaustion
+  // Each request gets its own connection that gets released immediately
   const optimizedParams = [
     'sslmode=require',
-    'connection_limit=10',
-    'pool_timeout=10',
-    'connect_timeout=10'
+    'connection_limit=1',
+    'pool_timeout=5',
+    'connect_timeout=5'
   ].join('&')
   
   const url = `${urlWithoutParams}?${optimizedParams}`
 
-  console.log('Prisma initialized with optimized connection pool (limit: 10, timeout: 10s)')
+  console.log('Prisma initialized (serverless: connection_limit=1)')
 
   return new PrismaClient({
     datasources: {
       db: { url },
     },
-    log: process.env.NODE_ENV === 'development' 
-      ? ['error', 'warn', 'query'] 
-      : ['error', 'warn'],
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   })
 }
 
-declare global {
-  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+// Development: singleton
+// Production serverless: new client per request
+const prisma = globalForPrisma.prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
 }
 
-// Global singleton to prevent multiple instances in serverless environments
-const prisma = globalThis.prisma ?? prismaClientSingleton()
-
-// Always store in globalThis (works for both dev and production)
-if (!globalThis.prisma) {
-  globalThis.prisma = prisma
-}
-
-// Graceful shutdown handlers to prevent connection leaks
-if (typeof process !== 'undefined') {
-  process.on('beforeExit', async () => {
-    console.log('Disconnecting Prisma...')
-    await prisma.$disconnect()
-  })
+// Helper for serverless: auto-disconnect after operations
+export async function withPrisma<T>(
+  callback: (prisma: PrismaClient) => Promise<T>
+): Promise<T> {
+  const isServerless = process.env.NODE_ENV === 'production'
+  const client = isServerless ? createPrismaClient() : prisma
   
-  process.on('SIGINT', async () => {
-    await prisma.$disconnect()
-    process.exit(0)
-  })
-  
-  process.on('SIGTERM', async () => {
-    await prisma.$disconnect()
-    process.exit(0)
-  })
+  try {
+    return await callback(client)
+  } finally {
+    if (isServerless) {
+      await client.$disconnect()
+    }
+  }
 }
 
 export default prisma
