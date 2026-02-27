@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         const passwordMatch = await bcrypt.compare(password, result.password)
         if (passwordMatch) {
           const token = uuidv4()
-          const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+          const expiresAt = new Date(Date.now() + 3 * 60 * 60 * 1000) // 3 hours
           activeSessions.set(token, { userId: result.id, email: result.email, expiresAt })
           console.log(`✅ DB login successful: ${result.email}`)
           return NextResponse.json({

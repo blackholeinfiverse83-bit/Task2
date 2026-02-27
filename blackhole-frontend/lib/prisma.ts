@@ -14,7 +14,7 @@ function createAuthPrismaClient() {
 
   const optimizedParams = [
     'sslmode=require',
-    'connection_limit=1',
+    'connection_limit=5',
     'pool_timeout=30',
     'connect_timeout=30'
   ].join('&')
@@ -52,7 +52,7 @@ function createNewsPrismaClient() {
   console.log('News Prisma initialized (connection_limit=1)')
   const optimizedParams = [
     'sslmode=require',
-    'connection_limit=1',
+    'connection_limit=5',
     'pool_timeout=30',
     'connect_timeout=30'
   ].join('&')

@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
+const SESSION_DURATION_MS = 3 * 60 * 60 * 1000 // 3 hours
+
 interface User {
   id: string
   email: string
@@ -20,74 +22,88 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// sessionStorage helpers — auto-clears when tab/browser closes
+function getSession() {
+  try {
+    const token = sessionStorage.getItem('auth_token')
+    const userStr = sessionStorage.getItem('auth_user')
+    const expiresAt = sessionStorage.getItem('auth_expires_at')
+    if (!token || !userStr || !expiresAt) return null
+    if (Date.now() > parseInt(expiresAt)) {
+      clearSession()
+      return null
+    }
+    return { token, user: JSON.parse(userStr) as User }
+  } catch { return null }
+}
+
+function saveSession(token: string, user: User) {
+  try {
+    sessionStorage.setItem('auth_token', token)
+    sessionStorage.setItem('auth_user', JSON.stringify(user))
+    sessionStorage.setItem('auth_expires_at', String(Date.now() + SESSION_DURATION_MS))
+  } catch { }
+}
+
+function clearSession() {
+  try {
+    sessionStorage.removeItem('auth_token')
+    sessionStorage.removeItem('auth_user')
+    sessionStorage.removeItem('auth_expires_at')
+  } catch { }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    // Check for existing session on mount
-    const checkSession = async () => {
-      const token = localStorage.getItem('auth_token')
-      
-      if (!token) {
-        setIsLoading(false)
-        return
-      }
+    // On mount: restore session from sessionStorage if still valid
+    const session = getSession()
+    if (session) {
+      setUser(session.user)
+    }
+    setIsLoading(false)
 
-      try {
-        const response = await fetch('/api/auth/verify', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          if (data.success) {
-            setUser(data.data.user)
-          } else {
-            localStorage.removeItem('auth_token')
-            localStorage.removeItem('auth_user')
-          }
-        } else {
-          localStorage.removeItem('auth_token')
-          localStorage.removeItem('auth_user')
+    // Auto-logout when tab becomes visible again after long time, or on focus
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        const session = getSession()
+        if (!session) {
+          setUser(null)
         }
-      } catch (error) {
-        console.error('Session check error:', error)
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('auth_user')
-      } finally {
-        setIsLoading(false)
       }
     }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
-    checkSession()
+    // Periodic check every 60 seconds
+    const interval = setInterval(() => {
+      const session = getSession()
+      if (!session) setUser(null)
+    }, 60_000)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(interval)
+    }
   }, [])
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       })
-
       const data = await response.json()
-
       if (data.success) {
-        localStorage.setItem('auth_token', data.data.token)
-        localStorage.setItem('auth_user', JSON.stringify(data.data.user))
+        saveSession(data.data.token, data.data.user)
         setUser(data.data.user)
         return { success: true }
-      } else {
-        return { success: false, error: data.error || 'Login failed' }
       }
-    } catch (error) {
-      console.error('Login error:', error)
+      return { success: false, error: data.error || 'Login failed' }
+    } catch {
       return { success: false, error: 'An unexpected error occurred' }
     }
   }
@@ -96,60 +112,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name })
       })
-
       const data = await response.json()
-
       if (data.success) {
-        localStorage.setItem('auth_token', data.data.token)
-        localStorage.setItem('auth_user', JSON.stringify(data.data.user))
+        saveSession(data.data.token, data.data.user)
         setUser(data.data.user)
         return { success: true }
-      } else {
-        return { success: false, error: data.error || 'Signup failed' }
       }
-    } catch (error) {
-      console.error('Signup error:', error)
+      return { success: false, error: data.error || 'Signup failed' }
+    } catch {
       return { success: false, error: 'An unexpected error occurred' }
     }
   }
 
   const logout = async () => {
-    const token = localStorage.getItem('auth_token')
-    
-    if (token) {
+    const session = getSession()
+    if (session?.token) {
       try {
         await fetch('/api/auth/logout', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ token })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: session.token })
         })
-      } catch (error) {
-        console.error('Logout error:', error)
-      }
+      } catch { }
     }
-
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('auth_user')
+    clearSession()
     setUser(null)
     router.push('/login')
   }
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      login,
-      signup,
-      logout
-    }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   )
@@ -157,8 +152,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider')
   return context
 }
