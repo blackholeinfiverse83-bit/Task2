@@ -82,8 +82,8 @@ async function withRetry<T>(
       if (
         error instanceof Error && 
         (error.message.includes('connection pool') || 
-         error.message.includes('P2024.message.includes('Tim') ||
-         errored out') ||
+         error.message.includes('P2024') ||
+         error.message.includes('Timed out') ||
          error.message.includes('P1001') ||
          error.message.includes('P1002'))
       ) {
