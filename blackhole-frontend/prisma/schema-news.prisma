@@ -1,0 +1,37 @@
+// Prisma schema for the NEWS-ONLY database (NEWS_DATABASE_URL)
+// This schema only contains news-related models (no auth tables)
+// Used to push the ScrapedNews table to the news Supabase instance
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/news-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("NEWS_DATABASE_URL")
+}
+
+model ScrapedNews {
+  id             String   @id @default(uuid())
+  customId       String   @unique // The 'id' field from your JSON
+  title          String
+  description    String
+  url            String   @unique
+  source         String
+  category       String
+  imageUrl       String?
+  publishedAt    String
+  readTime       String?
+  scrapedAt      String
+  scrapedData    Json?
+  summary        String?
+  insights       Json?
+  relatedVideos  Json?
+  storedAt       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Optional: mirrors the userId field in the main schema (no FK constraint since no User table here)
+  userId         String?
+}
