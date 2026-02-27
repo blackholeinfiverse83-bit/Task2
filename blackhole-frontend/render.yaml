@@ -15,6 +15,13 @@ services:
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false
+      # AUTH DATABASE - for User, Session, etc. (existing)
+      - key: AUTH_DATABASE_URL
+        sync: false
+      # NEWS DATABASE - for ScrapedNews (new separate database)
+      - key: NEWS_DATABASE_URL
+        sync: false
+      # Keep DATABASE_URL as fallback
       - key: DATABASE_URL
         sync: false
       - key: NEXT_PUBLIC_NOOPUR_API_BASE

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { withPrisma } from '@/lib/prisma'
+import { withNewsPrisma } from '@/lib/prisma'
 
 export async function GET() {
-  return withPrisma(async (prisma) => {
+  return withNewsPrisma(async (prisma) => {
     const articles = await prisma.scrapedNews.findMany({
       orderBy: { createdAt: 'desc' },
       take: 100
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Invalid payload' }, { status: 400 })
     }
 
-    return withPrisma(async (prisma) => {
+    return withNewsPrisma(async (prisma) => {
       const article = await prisma.scrapedNews.upsert({
         where: { url: body.url },
         update: {
@@ -74,7 +74,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: 'Article ID required' }, { status: 400 })
     }
 
-    return withPrisma(async (prisma) => {
+    return withNewsPrisma(async (prisma) => {
       await prisma.scrapedNews.delete({
         where: { customId: id }
       })

@@ -3,22 +3,15 @@ import { PrismaClient } from '@prisma/client'
 // Extend globalThis type
 declare global {
   var prisma: PrismaClient | undefined
+  var prismaNews: PrismaClient | undefined
 }
 
-// For serverless: minimal connection pool with aggressive cleanup
-function createPrismaClient() {
-  const baseUrl = process.env.DATABASE_URL || ''
+// Create Prisma client for AUTH database (User, Session, etc.)
+function createAuthPrismaClient() {
+  const baseUrl = process.env.AUTH_DATABASE_URL || process.env.DATABASE_URL || ''
   
-  // Use Supabase's PgBouncer pooler (port 6543) if available, otherwise direct
-  const isPooler = baseUrl.includes(':6543')
-  
-  // Remove existing connection params
   const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
   
-  // Connection strategy:
-  // - connection_limit=1: minimal connections
-  // - pool_timeout=3: fail fast (3 seconds)
-  // - connect_timeout=3: fail fast
   const optimizedParams = [
     'sslmode=require',
     'connection_limit=1',
@@ -28,55 +21,77 @@ function createPrismaClient() {
   
   const url = `${urlWithoutParams}?${optimizedParams}`
 
-  console.log(`Prisma initialized (${isPooler ? 'PgBouncer' : 'direct'}, connection_limit=1)`)
+  console.log('Auth Prisma initialized (connection_limit=1)')
 
   return new PrismaClient({
     datasources: {
       db: { url },
     },
-    // In production, only log errors
+    log: ['error'],
+  })
+}
+
+// Create Prisma client for NEWS database (ScrapedNews)
+function createNewsPrismaClient() {
+  const baseUrl = process.env.NEWS_DATABASE_URL || ''
+  
+  if (!baseUrl) {
+    throw new Error('NEWS_DATABASE_URL is not set!')
+  }
+  
+  const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
+  
+  const optimizedParams = [
+    'sslmode=require',
+    'connection_limit=1',
+    'pool_timeout=3',
+    'connect_timeout=3'
+  ].join('&')
+  
+  const url = `${urlWithoutParams}?${optimizedParams}`
+
+  console.log('News Prisma initialized (connection_limit=1)')
+
+  return new PrismaClient({
+    datasources: {
+      db: { url },
+    },
     log: ['error'],
   })
 }
 
 // Helper with aggressive retry and cleanup
-export async function withPrisma<T>(
+async function withRetry<T>(
+  createClient: () => PrismaClient,
   callback: (prisma: PrismaClient) => Promise<T>,
   maxRetries = 5
 ): Promise<T> {
   let lastError: Error | undefined
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    // Create fresh client for each attempt
-    const client = createPrismaClient()
+    const client = createClient()
     
     try {
       const result = await callback(client)
-      // Success: disconnect and return
       await client.$disconnect().catch(() => {})
       return result
     } catch (error) {
       lastError = error as Error
-      
-      // Always cleanup on error
       await client.$disconnect().catch(() => {})
       
-      // Only retry on connection errors
       if (
         error instanceof Error && 
         (error.message.includes('connection pool') || 
-         error.message.includes('P2024') ||
-         error.message.includes('Timed out') ||
-         error.message.includes('P1001') || // Can't reach database
-         error.message.includes('P1002'))   // Timeout
+         error.message.includes('P2024.message.includes('Tim') ||
+         errored out') ||
+         error.message.includes('P1001') ||
+         error.message.includes('P1002'))
       ) {
-        const delay = Math.min(1000 * attempt, 5000) // Exponential backoff: 1s, 2s, 3s, 4s, 5s
+        const delay = Math.min(1000 * attempt, 5000)
         console.log(`Connection attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms...`)
         await new Promise(resolve => setTimeout(resolve, delay))
         continue
       }
-      
-      // Non-connection errors: throw immediately
       throw error
     }
   }
@@ -84,11 +99,38 @@ export async function withPrisma<T>(
   throw lastError || new Error('Database connection failed after retries')
 }
 
-// Development singleton
-const prisma = globalThis.prisma ?? createPrismaClient()
+// ============ AUTH DATABASE (User, Session, etc.) ============
+
+export const authPrisma = globalThis.prisma ?? createAuthPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
-  globalThis.prisma = prisma
+  globalThis.prisma = authPrisma
 }
 
-export default prisma
+export async function withAuthPrisma<T>(
+  callback: (prisma: PrismaClient) => Promise<T>,
+  maxRetries = 5
+): Promise<T> {
+  return withRetry(createAuthPrismaClient, callback, maxRetries)
+}
+
+export default authPrisma
+
+// ============ NEWS DATABASE (ScrapedNews) ============
+
+export const newsPrisma = globalThis.prismaNews ?? createNewsPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prismaNews = newsPrisma
+}
+
+export async function withNewsPrisma<T>(
+  callback: (prisma: PrismaClient) => Promise<T>,
+  maxRetries = 5
+): Promise<T> {
+  return withRetry(createNewsPrismaClient, callback, maxRetries)
+}
+
+// Export for backwards compatibility
+export const prisma = authPrisma
+export const withPrisma = withAuthPrisma
