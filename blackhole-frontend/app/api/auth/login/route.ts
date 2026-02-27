@@ -3,6 +3,40 @@ import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 
+// Retry helper for database operations
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries = 3,
+  delay = 500
+): Promise<T> {
+  let lastError: Error | undefined
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation()
+    } catch (error) {
+      lastError = error as Error
+      
+      // Only retry on connection pool errors
+      if (
+        error instanceof Error && 
+        (error.message.includes('connection pool') || 
+         error.message.includes('P2024') ||
+         error.message.includes('Timed out'))
+      ) {
+        console.log(`Connection attempt ${attempt} failed, retrying in ${delay}ms...`)
+        await new Promise(resolve => setTimeout(resolve, delay * attempt))
+        continue
+      }
+      
+      // For other errors, throw immediately
+      throw error
+    }
+  }
+  
+  throw lastError || new Error('Operation failed after retries')
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
@@ -14,9 +48,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email }
+    // Find user with retry logic
+    const user = await withRetry(async () => {
+      return await prisma.user.findUnique({
+        where: { email }
+      })
     })
 
     if (!user) {
@@ -36,19 +72,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update last login
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() }
+    // Update last login with retry
+    await withRetry(async () => {
+      return await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() }
+      })
     })
 
-    // Create session
-    const session = await prisma.session.create({
-      data: {
-        token: uuidv4(),
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-      }
+    // Create session with retry
+    const session = await withRetry(async () => {
+      return await prisma.session.create({
+        data: {
+          token: uuidv4(),
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        }
+      })
     })
 
     return NextResponse.json({
@@ -64,6 +104,15 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Login error:', error)
+    
+    // Check if it's a connection pool error
+    if (error instanceof Error && error.message.includes('connection pool')) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection busy. Please try again in a moment.' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
