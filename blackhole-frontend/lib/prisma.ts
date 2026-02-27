@@ -1,21 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 
-// Force cleanup any existing connections before creating new ones
-if (globalThis.prisma) {
-  console.log('Force disconnecting existing Prisma instance...')
-  try {
-    await (globalThis.prisma as PrismaClient).$disconnect()
-  } catch (e) {
-    // Ignore errors during cleanup
-  }
-  delete (globalThis as any).prisma
+// Extend globalThis type
+declare global {
+  var prisma: PrismaClient | undefined
 }
 
 // For serverless: minimal connection pool with aggressive cleanup
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
-
 function createPrismaClient() {
   const baseUrl = process.env.DATABASE_URL || ''
   
@@ -94,11 +84,11 @@ export async function withPrisma<T>(
   throw lastError || new Error('Database connection failed after retries')
 }
 
-// Export singleton for development only
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+// Development singleton
+const prisma = globalThis.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
+  globalThis.prisma = prisma
 }
 
 export default prisma
