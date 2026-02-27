@@ -41,7 +41,16 @@ export default function Home() {
   const [backendStatus, setBackendStatus] = useState<'online' | 'offline' | 'checking'>('checking')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([])
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(() => {
+    // Restore cached articles instantly so they don't vanish on tab switch
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = sessionStorage.getItem('cachedNewsItems')
+        if (cached) return JSON.parse(cached)
+      } catch { }
+    }
+    return []
+  })
   const [activeVideo, setActiveVideo] = useState<{
     article: NewsItem
     video: NonNullable<NewsItem['relatedVideos']>[number]
@@ -115,7 +124,7 @@ export default function Home() {
       // Only log once per session to reduce console spam
       if (!(window as any).__sankalpLoadLogged) {
         console.log('📰 Loading from Sankalp...')
-        ;(window as any).__sankalpLoadLogged = true
+          ; (window as any).__sankalpLoadLogged = true
       }
       const sankalpFeed = await getSankalpFeed()
       sankalpItems = sankalpFeed.items.map((item: SankalpItem) => {
@@ -147,7 +156,7 @@ export default function Home() {
       // Suppress repeated error messages
       if (!(error as any).__logged) {
         console.warn('⚠️ Failed to load Sankalp feed (backend may be offline)')
-        ;(error as any).__logged = true
+          ; (error as any).__logged = true
       }
     }
 
@@ -320,6 +329,8 @@ export default function Home() {
     const filtered = sanitizedNews.filter(item => !deleted.includes(item.id))
 
     setNewsItems(filtered)
+    // Cache for instant display on tab switch
+    try { sessionStorage.setItem('cachedNewsItems', JSON.stringify(filtered)) } catch { }
   }
 
   const categories = [
