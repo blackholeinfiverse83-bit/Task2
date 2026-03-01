@@ -241,7 +241,11 @@ class APIService {
    * Helper method to handle API calls with fallback to mock data
    */
   async fetchWithFallback(endpoint, options = {}) {
-    if (!this.useMockData || !this.backendChecked) {
+    // Ensure initialization is complete before making requests
+    if (!this.backendChecked) {
+      await this.initialize();
+    }
+    if (!this.useMockData) {
       try {
         const url = `${API_BASE_URL}${endpoint}`
         const method = options.method || 'GET'

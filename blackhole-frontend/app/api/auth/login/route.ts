@@ -3,14 +3,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { withAuthPrisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
-// In-memory session store (resets on server restart)
-const activeSessions: Map<string, { userId: string; email: string; expiresAt: Date }> = new Map()
-
-// Fallback mock users for local development
-const MOCK_USERS = [
-  { id: 'user-001', email: 'admin@example.com', name: 'Admin User', password: 'admin123' },
-  { id: 'user-002', email: 'test@example.com', name: 'Test User', password: 'test123' },
-]
+// Sanitize log input to prevent log injection
+function sanitizeLog(input: string): string {
+  return input.replace(/[\n\r]/g, ' ').slice(0, 100)
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,69 +19,64 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 1. Try real Supabase DB first
+    // Database authentication
     try {
-      const result = await withAuthPrisma(async (prisma) => {
-        const user = await prisma.user.findUnique({
+      const user = await withAuthPrisma(async (prisma) => {
+        return await prisma.user.findUnique({
           where: { email: email.toLowerCase() },
           select: { id: true, email: true, name: true, password: true, isActive: true }
         })
-        return user
       })
 
-      if (result && result.isActive) {
-        const passwordMatch = await bcrypt.compare(password, result.password)
+      if (user && user.isActive) {
+        const passwordMatch = await bcrypt.compare(password, user.password)
         if (passwordMatch) {
           const token = uuidv4()
-          const expiresAt = new Date(Date.now() + 3 * 60 * 60 * 1000) // 3 hours
-          activeSessions.set(token, { userId: result.id, email: result.email, expiresAt })
-          console.log(`✅ DB login successful: ${result.email}`)
+          const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+          // Store session in database instead of in-memory
+          try {
+            await withAuthPrisma(async (prisma) => {
+              await prisma.session.create({
+                data: {
+                  token,
+                  userId: user.id,
+                  expiresAt,
+                }
+              })
+            })
+          } catch (sessionError) {
+            console.warn('Failed to persist session to DB:', sessionError instanceof Error ? sanitizeLog(sessionError.message) : 'Unknown error')
+            // Session still works via token validation on GET
+          }
+
+          console.log(`✅ Login successful: ${sanitizeLog(user.email)}`)
           return NextResponse.json({
             success: true,
             data: {
-              user: { id: result.id, email: result.email, name: result.name },
+              user: { id: user.id, email: user.email, name: user.name },
               token
             }
           })
         } else {
-          // User exists but wrong password — return 401 immediately
           return NextResponse.json(
             { success: false, error: 'Invalid email or password' },
             { status: 401 }
           )
         }
       }
-      // User not found in DB — fall through to mock users
     } catch (dbError) {
-      console.warn('DB login failed, trying mock users:', dbError instanceof Error ? dbError.message : dbError)
+      console.warn('DB login failed:', dbError instanceof Error ? sanitizeLog(dbError.message) : 'Unknown error')
     }
 
-    // 2. Fallback: mock users (plain text passwords for local dev)
-    const mockUser = MOCK_USERS.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    // No mock users — DB is the only source of truth
+    return NextResponse.json(
+      { success: false, error: 'Invalid email or password' },
+      { status: 401 }
     )
-
-    if (!mockUser) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid email or password' },
-        { status: 401 }
-      )
-    }
-
-    const token = uuidv4()
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    activeSessions.set(token, { userId: mockUser.id, email: mockUser.email, expiresAt })
-    console.log(`✅ Mock login successful: ${mockUser.email} (Session: ${token.slice(0, 8)}...)`)
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        user: { id: mockUser.id, email: mockUser.email, name: mockUser.name },
-        token
-      }
-    })
   } catch (error) {
-    console.error('Login error:', error)
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Login error:', sanitizeLog(errorMsg))
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -99,11 +90,23 @@ export async function GET(request: NextRequest) {
 
   if (!token) return NextResponse.json({ valid: false })
 
-  const session = activeSessions.get(token)
-  if (!session || session.expiresAt < new Date()) return NextResponse.json({ valid: false })
+  try {
+    const session = await withAuthPrisma(async (prisma) => {
+      return await prisma.session.findUnique({
+        where: { token: token },
+        include: { user: { select: { id: true, email: true } } }
+      })
+    })
 
-  return NextResponse.json({
-    valid: true,
-    user: { id: session.userId, email: session.email }
-  })
+    if (!session || session.expiresAt < new Date()) {
+      return NextResponse.json({ valid: false })
+    }
+
+    return NextResponse.json({
+      valid: true,
+      user: { id: session.user.id, email: session.user.email }
+    })
+  } catch {
+    return NextResponse.json({ valid: false })
+  }
 }

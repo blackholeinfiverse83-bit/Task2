@@ -6,8 +6,8 @@ import Header from '@/components/Header'
 import BackendStatus from '@/components/BackendStatus'
 import { checkBackendHealth, getSankalpFeed, fetchTTSAudio, type SankalpItem } from '@/lib/api'
 import { getCurrentTranslateLanguage, getTTSLanguageCode } from '@/lib/translate'
-import { getSavedNews, removeSavedNews, SavedNewsItem } from '@/lib/newsStorage'
-import { Search, Filter, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X, Trophy, Landmark, Siren, Plane, UtensilsCrossed, Volume2, Loader2 } from 'lucide-react'
+import { getSavedNews, removeSavedNews } from '@/lib/newsStorage'
+import { Search, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X, Trophy, Landmark, Siren, Plane, UtensilsCrossed, Volume2, Loader2, Filter } from 'lucide-react'
 
 interface NewsItem {
   id: string
@@ -68,42 +68,31 @@ export default function Home() {
   useEffect(() => {
     checkBackend()
     loadNewsFeed()
-    const interval = setInterval(checkBackend, 30000)
+    const interval = setInterval(checkBackend, 60000)
 
-    // Listen for storage changes to refresh feed when new articles are added
-    const handleStorageChange = () => {
-      loadNewsFeed()
+    // Listen for storage changes (cross-tab) and custom events (same-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'newsFeedUpdated' || e.key === null) {
+        loadNewsFeed()
+      }
     }
     window.addEventListener('storage', handleStorageChange)
 
-    // Listen for custom event when articles are saved in same tab
     const handleNewsSaved = (event?: CustomEvent) => {
       console.log('📰 News article saved event received:', event?.detail)
       loadNewsFeed()
     }
     window.addEventListener('newsArticleSaved', handleNewsSaved as EventListener)
 
-    // Also listen for localStorage changes
-    const handleStorageUpdate = () => {
-      if (localStorage.getItem('newsFeedUpdated')) {
-        console.log('📰 Storage update detected, refreshing feed')
-        loadNewsFeed()
-        localStorage.removeItem('newsFeedUpdated')
-      }
-    }
-    window.addEventListener('storage', handleStorageUpdate)
-
-    // Also check periodically for changes (in case same tab adds articles)
-    // Reduced frequency to prevent infinite loops and excessive API calls
+    // Periodic refresh (60 seconds)
     const refreshInterval = setInterval(() => {
       loadNewsFeed()
-    }, 30000) // Changed from 3000ms to 30000ms (30 seconds)
+    }, 60000)
 
     return () => {
       clearInterval(interval)
       clearInterval(refreshInterval)
       window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('storage', handleStorageUpdate)
       window.removeEventListener('newsArticleSaved', handleNewsSaved as EventListener)
     }
   }, [])
@@ -118,16 +107,14 @@ export default function Home() {
   }
 
   const loadNewsFeed = async () => {
-    // Try to load from Sankalp first
     let sankalpItems: NewsItem[] = []
     try {
-      // Only log once per session to reduce console spam
       if (!(window as any).__sankalpLoadLogged) {
         console.log('📰 Loading from Sankalp...')
           ; (window as any).__sankalpLoadLogged = true
       }
       const sankalpFeed = await getSankalpFeed()
-      sankalpItems = sankalpFeed.items.map((item: SankalpItem) => {
+      sankalpItems = (sankalpFeed?.items || []).map((item: SankalpItem) => {
         const newsItem = {
           id: item.id || `item-${Date.now()}-${Math.random()}`,
           title: typeof item.title === 'string' ? item.title : (typeof item.script === 'string' ? item.script.substring(0, 100) : 'Untitled'),
@@ -160,11 +147,9 @@ export default function Home() {
       }
     }
 
-    // Load saved scraped articles from file
     const savedArticles = await getSavedNews()
-    const localScraped = mapSavedItemsToNews(savedArticles)
-    // Merge: Sankalp items first, then scraped
-    const allNews = mergeByUrl([...sankalpItems, ...localScraped])
+    const localScraped = mapSavedItemsToNews(savedArticles || [])
+    const allNews = mergeByUrl([...(sankalpItems || []), ...(localScraped || [])])
 
     console.log('📰 Total news loaded:', {
       sankalpCount: sankalpItems.length,
@@ -172,7 +157,6 @@ export default function Home() {
       totalCount: allNews.length
     })
 
-    // Sample news items - in production, this would come from an API
     const sampleNews: NewsItem[] = [
       {
         id: '1',
@@ -309,28 +293,22 @@ export default function Home() {
     ]
 
 
-    // If we have Sankalp items or scraped items, use them; otherwise use sample news as fallback
-    const finalNews = allNews.length > 0 ? allNews : sampleNews
-
-    // CRITICAL: Sanitize all items to ensure they have valid title and description
-    const sanitizedNews = finalNews.map(item => ({
+    const finalNews = (allNews?.length || 0) > 0 ? allNews : sampleNews
+    const sanitizedNews = (finalNews || []).map(item => ({
       ...item,
-      id: item.id || `item-${Date.now()}-${Math.random()}`,
-      title: String(item.title || 'Untitled'),
-      description: String(item.description || ''),
-      url: String(item.url || item.id || ''),
-      category: String(item.category || 'general'),
-      source: String(item.source || 'Unknown'),
-      publishedAt: String(item.publishedAt || 'Recently'),
+      id: item?.id || `item-${Date.now()}-${Math.random()}`,
+      title: String(item?.title || 'Untitled'),
+      description: String(item?.description || ''),
+      url: String(item?.url || item?.id || ''),
+      category: String(item?.category || 'general'),
+      source: String(item?.source || 'Unknown'),
+      publishedAt: String(item?.publishedAt || 'Recently'),
     }))
+    const deleted = JSON.parse(localStorage.getItem('deleted_articles') || '[]') || []
+    const filtered = sanitizedNews.filter(item => item?.id && !deleted.includes(item.id))
 
-    // Filter out deleted articles
-    const deleted = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
-    const filtered = sanitizedNews.filter(item => !deleted.includes(item.id))
-
-    setNewsItems(filtered)
-    // Cache for instant display on tab switch
-    try { sessionStorage.setItem('cachedNewsItems', JSON.stringify(filtered)) } catch { }
+    setNewsItems(filtered || [])
+    try { sessionStorage.setItem('cachedNewsItems', JSON.stringify(filtered || [])) } catch (e) { console.warn('Cache failed:', e) }
   }
 
   const categories = [
@@ -367,7 +345,7 @@ export default function Home() {
   }
 
   const handlePlaySummaryTTS = async () => {
-    if (!activeVideo?.article.description || ttsLoading) return
+    if (!activeVideo?.article?.description || ttsLoading) return
     if (ttsAudioUrlRef.current) {
       URL.revokeObjectURL(ttsAudioUrlRef.current)
       ttsAudioUrlRef.current = null
@@ -406,18 +384,32 @@ export default function Home() {
     handleAnalyzeArticle(news.url)
   }
 
+  const handleClearAllData = () => {
+    if (confirm('Clear all saved data? This cannot be undone.')) {
+      localStorage.removeItem('deleted_articles')
+      sessionStorage.removeItem('cachedNewsItems')
+      setNewsItems([])
+      loadNewsFeed()
+    }
+  }
+
   const handleRemoveArticle = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (confirm('Remove this article from your feed?')) {
       setNewsItems(newsItems.filter(item => item.id !== id))
       const article = newsItems.find(item => item.id === id)
       if (article?.isScraped) {
-        await removeSavedNews(id)
+        try {
+          await removeSavedNews(id)
+        } catch (error) {
+          console.error('Failed to remove saved news:', error)
+        }
       }
-      // Store deleted IDs to filter them out on reload
-      const deleted = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
+      // Store deleted IDs to filter them out on reload (cap at 500)
+      const deleted: string[] = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
       deleted.push(id)
-      localStorage.setItem('deleted_articles', JSON.stringify(deleted))
+      const capped = deleted.slice(-500)
+      localStorage.setItem('deleted_articles', JSON.stringify(capped))
     }
   }
 
@@ -444,16 +436,7 @@ export default function Home() {
           </p>
           <div className="mt-4">
             <button
-              onClick={async () => {
-                if (confirm('Clear all saved news?')) {
-                  const articles = await getSavedNews()
-                  for (const article of articles) {
-                    await removeSavedNews(article.id)
-                  }
-                  localStorage.removeItem('deleted_articles')
-                  window.location.reload()
-                }
-              }}
+              onClick={handleClearAllData}
               className="text-xs text-red-400 hover:text-red-300 underline"
             >
               Clear All Saved Data

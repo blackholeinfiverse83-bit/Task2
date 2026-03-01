@@ -21,7 +21,8 @@ import {
 // Mock API functions (replace with actual API calls)
 const checkBackendHealth = async () => {
   try {
-    const response = await fetch('http://localhost:8000/health')
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE || 'https://localhost:8000'
+    const response = await fetch(`${apiUrl}/health`)
     return response.ok
   } catch {
     return false
@@ -30,7 +31,8 @@ const checkBackendHealth = async () => {
 
 const runUnifiedWorkflow = async (url: string) => {
   try {
-    const response = await fetch('http://localhost:8000/api/unified-news-workflow', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE || 'https://localhost:8000'
+    const response = await fetch(`${apiUrl}/api/unified-news-workflow`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })

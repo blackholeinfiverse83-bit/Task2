@@ -45,6 +45,7 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
   // Prevent hydration errors by only rendering iframe on client
   useEffect(() => {
     setIsMounted(true)
+    return () => setIsMounted(false)
   }, [])
 
   // Use default videos if none provided
@@ -95,191 +96,90 @@ export default function VideoPlayer({ videos, title = "Related Videos" }: VideoP
 
   // Load YouTube IFrame API with reduced warnings
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    // Check if API is already loaded
-    if (window.YT && window.YT.Player) {
+    if (typeof window === 'undefined' || !isMounted) return
+    if (window.YT?.Player) {
       setIsYoutubeAPIReady(true)
       return
     }
-
-    // Load the script if not already loaded
     const existingScript = document.querySelector('script[src*="youtube.com/iframe_api"]')
     if (existingScript) {
-      // Wait for API to be ready
-      window.onYouTubeIframeAPIReady = () => {
-        setIsYoutubeAPIReady(true)
-      }
+      window.onYouTubeIframeAPIReady = () => setIsYoutubeAPIReady(true)
       return
     }
-
     const tag = document.createElement('script')
     tag.src = 'https://www.youtube.com/iframe_api'
     tag.async = true
     tag.defer = true
     const firstScriptTag = document.getElementsByTagName('script')[0]
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
-
-    window.onYouTubeIframeAPIReady = () => {
-      setIsYoutubeAPIReady(true)
-    }
-  }, [])
+    window.onYouTubeIframeAPIReady = () => setIsYoutubeAPIReady(true)
+  }, [isMounted])
 
   // Initialize YouTube player when video changes
   useEffect(() => {
-    if (!isYoutubeAPIReady || !window.YT || !currentVideoData) return
-    if (!isYouTubeVideo(currentVideoData.url)) return
-
-    const videoId = getYouTubeVideoId(currentVideoData.url)
+    if (!isYoutubeAPIReady || !window.YT || !currentVideoData || !isMounted) return
+    if (!isYouTubeVideo(currentVideoData?.url)) return
+    const videoId = getYouTubeVideoId(currentVideoData?.url)
     if (!videoId || !playerContainerRef.current) return
-
-    // Destroy existing player
     if (playerRef.current) {
-      try {
-        playerRef.current.destroy()
-      } catch (e) {
-        console.warn('Error destroying YouTube player:', e)
-      }
+      try { playerRef.current.destroy() } catch (e) { console.warn('Destroy error:', e) }
       playerRef.current = null
     }
-
-    // Clear the container
-    if (playerContainerRef.current) {
-      playerContainerRef.current.innerHTML = ''
-    }
-
-    // Create new player
+    if (playerContainerRef.current) playerContainerRef.current.innerHTML = ''
     try {
       const player = new window.YT.Player(playerContainerRef.current, {
         videoId: videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          modestbranding: 1,
-          rel: 0,
-          showinfo: 0,
-          iv_load_policy: 3,
-          fs: 0,
-          cc_load_policy: 0,
-          disablekb: 1
-        },
+        playerVars: { autoplay: 0, controls: 0, modestbranding: 1, rel: 0, showinfo: 0, iv_load_policy: 3, fs: 0, cc_load_policy: 0, disablekb: 1 },
         events: {
-          onReady: (event: any) => {
-            playerRef.current = event.target
-            setYoutubePlayer(event.target)
-            setIsPlaying(false)
-            setCurrentTime(0)
-          },
-          onStateChange: (event: any) => {
-            // YT.PlayerState.PLAYING = 1, PAUSED = 2, ENDED = 0
-            if (event.data === 1) {
-              setIsPlaying(true)
-            } else if (event.data === 2 || event.data === 0) {
-              setIsPlaying(false)
-            }
-          },
-          onError: (event: any) => {
-            // YouTube error codes: 2=invalid video, 5=HTML5 error, 100=not found, 101/150=not allowed
-            const errorCodes: { [key: number]: string } = {
-              2: 'Invalid video parameter',
-              5: 'HTML5 player error',
-              100: 'Video not found',
-              101: 'Video not allowed to be played in embedded players',
-              150: 'Video not allowed to be played in embedded players'
-            }
-            const errorMessage = errorCodes[event.data] || 'Video playback error'
-            console.warn('YouTube player error:', errorMessage, 'Code:', event.data)
-            setVideoError(errorMessage)
-            setIsPlaying(false)
-          }
+          onReady: (event: any) => { playerRef.current = event.target; setYoutubePlayer(event.target); setIsPlaying(false); setCurrentTime(0) },
+          onStateChange: (event: any) => { setIsPlaying(event.data === 1) },
+          onError: (event: any) => { const errors: { [key: number]: string } = { 2: 'Invalid video', 5: 'HTML5 error', 100: 'Not found', 101: 'Not allowed', 150: 'Not allowed' }; setVideoError(errors[event.data] || 'Error'); setIsPlaying(false) }
         }
       })
     } catch (error) {
-      console.error('Error creating YouTube player:', error)
-      setVideoError('Failed to load video player')
+      console.error('Player error:', error)
+      setVideoError('Failed to load')
     }
-
     return () => {
       if (playerRef.current) {
-        try {
-          playerRef.current.destroy()
-        } catch (e) {
-          console.warn('Error destroying YouTube player on cleanup:', e)
-        }
+        try { playerRef.current.destroy() } catch (e) { console.warn('Cleanup error:', e) }
         playerRef.current = null
       }
     }
-  }, [currentVideo, isYoutubeAPIReady, currentVideoData?.url])
+  }, [currentVideo, isYoutubeAPIReady, currentVideoData?.url, isMounted])
 
   // Update current time for YouTube videos
   useEffect(() => {
-    if (!playerRef.current || !isPlaying) return
-
+    if (!playerRef.current || !isPlaying || !isMounted) return
     const interval = setInterval(() => {
       try {
-        if (playerRef.current) {
-          const time = playerRef.current.getCurrentTime()
-          setCurrentTime(Math.floor(time))
-        }
-      } catch (e) {
-        // Player might not be ready
-      }
+        if (playerRef.current) setCurrentTime(Math.floor(playerRef.current.getCurrentTime()))
+      } catch (e) { /* ignore */ }
     }, 1000)
-
     return () => clearInterval(interval)
-  }, [youtubePlayer, isPlaying])
+  }, [youtubePlayer, isPlaying, isMounted])
 
   const togglePlay = () => {
-    if (playerRef.current && isYouTubeVideo(currentVideoData.url)) {
-      try {
-        if (isPlaying) {
-          playerRef.current.pauseVideo()
-        } else {
-          playerRef.current.playVideo()
-        }
-      } catch (error) {
-        console.error('Error toggling YouTube playback:', error)
-        setIsPlaying(!isPlaying)
-      }
+    if (playerRef.current && isYouTubeVideo(currentVideoData?.url)) {
+      try { isPlaying ? playerRef.current.pauseVideo() : playerRef.current.playVideo() } catch (error) { console.error('Playback error:', error); setIsPlaying(!isPlaying) }
     } else {
       setIsPlaying(!isPlaying)
     }
   }
-
   const nextVideo = () => {
-    if (playerRef.current) {
-      try {
-        playerRef.current.stopVideo()
-      } catch (e) {
-        // Ignore errors
-      }
-    }
+    if (playerRef.current) { try { playerRef.current.stopVideo() } catch (e) { /* ignore */ } }
     setCurrentVideo((prev) => (prev + 1) % videoList.length)
     setCurrentTime(0)
     setIsPlaying(false)
   }
-
   const prevVideo = () => {
-    if (playerRef.current) {
-      try {
-        playerRef.current.stopVideo()
-      } catch (e) {
-        // Ignore errors
-      }
-    }
+    if (playerRef.current) { try { playerRef.current.stopVideo() } catch (e) { /* ignore */ } }
     setCurrentVideo((prev) => (prev - 1 + videoList.length) % videoList.length)
     setCurrentTime(0)
     setIsPlaying(false)
   }
-
   const selectVideo = (index: number) => {
-    if (playerRef.current) {
-      try {
-        playerRef.current.stopVideo()
-      } catch (e) {
-        // Ignore errors
-      }
-    }
+    if (playerRef.current) { try { playerRef.current.stopVideo() } catch (e) { /* ignore */ } }
     setCurrentVideo(index)
     setCurrentTime(0)
     setIsPlaying(false)

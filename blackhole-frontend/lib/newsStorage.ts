@@ -38,9 +38,9 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
       'No description available'
 
     // Use backend category if available, otherwise detect from content
-    const detectedCategory = scrapedData.scraped_data?.category || 
-                             detectCategory(title, description)
-    
+    const detectedCategory = scrapedData.scraped_data?.category ||
+      detectCategory(title, description)
+
     const newsItem: SavedNewsItem = {
       id: `scraped_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title,
@@ -120,43 +120,43 @@ function extractTitleFromUrl(url: string): string {
 
 function detectCategory(title: string, description: string): string {
   const text = (title + ' ' + description).toLowerCase()
-  
+
   // Sports (high priority - specific match patterns)
   if (text.match(/\b(sports?|football|soccer|basketball|baseball|tennis|cricket|rugby|hockey|golf|olympics?|athlete|match|game|team|player|championship|tournament|league|score|win|goal|nfl|nba|mlb|nhl|fifa|uefa|ipl)\b/)) return 'sports'
-  
+
   // Politics
   if (text.match(/\b(politics?|political|election|vote|voting|government|minister|prime minister|president|parliament|congress|senate|policy|law|legislation|party|democrat|republican|campaign|candidate|politician|diplomacy|brexit)\b/)) return 'politics'
-  
+
   // Entertainment
   if (text.match(/\b(entertainment|movie|film|cinema|actor|actress|celebrity|music|album|song|concert|hollywood|bollywood|show|series|tv|television|netflix|streaming|performance|award|premiere)\b/)) return 'entertainment'
-  
+
   // Technology
   if (text.match(/\b(tech|technology|software|ai|artificial intelligence|computer|digital|internet|app|startup|gadget|device|smartphone|iphone|android|cyber|data|programming|robot|automation|blockchain|crypto|bitcoin)\b/)) return 'technology'
-  
+
   // Business
   if (text.match(/\b(business|economy|economic|market|stock|finance|financial|investment|investor|company|corporate|ceo|entrepreneur|trade|commerce|industry|manufacturing|revenue|profit|loss|earnings|gdp|inflation|banking|bank)\b/)) return 'business'
-  
+
   // Science
   if (text.match(/\b(science|scientific|research|study|discovery|space|nasa|mars|moon|astronomy|physics|chemistry|biology|experiment|scientist|laboratory|dna|gene|quantum)\b/)) return 'science'
-  
+
   // Health
   if (text.match(/\b(health|medical|medicine|healthcare|doctor|hospital|clinic|patient|disease|illness|virus|pandemic|vaccine|treatment|cure|surgery|mental health|wellness|fitness|nutrition|diet|cancer|covid)\b/)) return 'health'
-  
+
   // Crime
   if (text.match(/\b(crime|criminal|police|arrest|murder|theft|robbery|assault|investigation|court|trial|lawyer|judge|sentence|prison|jail|fraud|scam|corruption|illegal|drug|weapon|gun|shooting)\b/)) return 'crime'
-  
+
   // Environment
   if (text.match(/\b(environment|climate change|global warming|pollution|carbon|emissions|green|sustainable|renewable|energy|solar|wind|recycling|conservation|wildlife|nature|forest|ocean|weather|disaster|flood|earthquake|hurricane)\b/)) return 'environment'
-  
+
   // Education
   if (text.match(/\b(education|school|university|college|student|teacher|professor|academic|study|exam|test|grade|degree|scholarship|learning|campus|admission|enrollment|curriculum)\b/)) return 'education'
-  
+
   // Travel
   if (text.match(/\b(travel|tourism|tourist|vacation|holiday|trip|journey|flight|airline|airport|hotel|resort|destination|passport|visa|booking|adventure|explore)\b/)) return 'travel'
-  
+
   // Food
   if (text.match(/\b(food|cuisine|restaurant|chef|cooking|recipe|meal|dish|flavor|taste|dining|gastronomy|organic|vegan|vegetarian|diet|nutrition|culinary|bakery|cafe)\b/)) return 'food'
-  
+
   return 'general'
 }
 
@@ -190,7 +190,9 @@ function findBestImage(scrapedData: any, title: string): string | undefined {
       return false
     }
   })
-  return valid || `https://source.unsplash.com/800x600/?news,${encodeURIComponent(title.split(' ').slice(0, 4).join(' '))}`
+  // Return a gradient placeholder SVG (source.unsplash.com is deprecated)
+  const encodedTitle = encodeURIComponent(title.split(' ').slice(0, 4).join(' ') || 'news')
+  return valid || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='600' fill='url(%23g)'/%3E%3Ctext x='400' y='310' text-anchor='middle' fill='white' font-size='32' font-family='sans-serif'%3E${encodedTitle}%3C/text%3E%3C/svg%3E`
 }
 
 function extractRelatedVideos(scrapedData: any) {

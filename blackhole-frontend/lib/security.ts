@@ -99,13 +99,15 @@ function arrayBufferToHex(buffer: ArrayBuffer): string {
  */
 export async function signRequest(payload: SignaturePayload): Promise<string> {
     try {
-        const secret = process.env.NEXT_PUBLIC_HMAC_SECRET || ''
+        // Use server-side-only env var to avoid exposing the secret in client bundles.
+        // NOTE: If this runs client-side, the secret will be empty and signature will be skipped.
+        const secret = (typeof window === 'undefined' ? process.env.HMAC_SECRET : '') || ''
 
         if (!secret || secret === 'your_hmac_secret_here') {
             // Suppress warning in production - only log once per session
             if (typeof window !== 'undefined' && !(window as any).__hmacWarningLogged) {
                 console.debug('HMAC secret not configured, using empty signature (this is normal in development)')
-                ;(window as any).__hmacWarningLogged = true
+                    ; (window as any).__hmacWarningLogged = true
             }
             return ''
         }

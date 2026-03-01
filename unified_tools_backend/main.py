@@ -5,8 +5,6 @@ import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-import pandas as pd
-import numpy as np
 import requests
 from bs4 import BeautifulSoup
 import openai
@@ -37,7 +35,14 @@ if hasattr(sys.stderr, "reconfigure"):
 
 app = FastAPI(title="Unified Tools API", version="2.0.0")
 
-# Enhanced CORS middleware for dashboard compatibility
+@app.on_event("startup")
+async def startup_event():
+    print(f"\u2705 Server started at {datetime.now().isoformat()} (PID {os.getpid()})")
+
+# Build CORS origins list from static + environment
+_extra_origins = os.getenv("CORS_EXTRA_ORIGINS", "").split(",")
+_extra_origins = [o.strip() for o in _extra_origins if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -45,20 +50,19 @@ app.add_middleware(
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
-        "https://blackhole-infiverse-frontend.vercel.app",  # Vercel deployment
-        "https://blackholeinfiverse-project-blackhole-frontend.onrender.com",  # Render frontend (if deployed)
-        "null",  # For file:// origins
-        "*"  # Allow all origins for development
-    ],
+        "https://blackhole-infiverse-frontend.vercel.app",
+        "https://blackhole-frontend.onrender.com",
+        "https://news-ai-frontend.onrender.com",
+    ] + _extra_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
 # Mount Sankalp data directory for static files (audio, reports)
 try:
     # Go up one level from unified_tools_backend to project root, then into sankalp-insight-node
-    sankalp_base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "sankalp-insight-node"))
+    sankalp_base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "sankalp-insight-node")).strip()
     
     # Serve /data (for audio files)
     data_dir = os.path.join(sankalp_base, "data")
@@ -83,11 +87,12 @@ except Exception as e:
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") if os.getenv("ENABLE_OPENAI", "0") == "1" else None
 GROK_API_KEY = os.getenv("GROK_API_KEY") if os.getenv("ENABLE_GROK", "0") == "1" else None
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
-# Use ngrok Ollama endpoint; override OLLAMA_BASE_URL with your ngrok URL
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", " https://249b3496e9d6.ngrok-free.app ")
+# LLM URLs: empty defaults prevent hanging on expired ngrok tunnels.
+# Set via environment variables when tunnels are active.
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "").strip()
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
 # Blackhole Infiverse LLP Custom LLM Service (fallback option)
-BLACKHOLE_LLM_URL = os.getenv("BLACKHOLE_LLM_URL", "https://d52770bec07e.ngrok-free.app")
+BLACKHOLE_LLM_URL = os.getenv("BLACKHOLE_LLM_URL", "").strip()
 BLACKHOLE_LLM_MODEL = os.getenv("BLACKHOLE_LLM_MODEL", "llama3.1")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
@@ -513,6 +518,19 @@ class ScrapingService:
             "url_type": "general"
         }
         
+        # Security: Reject dangerous protocols
+        if not url.startswith(('http://', 'https://')):
+            validation_result["is_valid"] = False
+            validation_result["issues"].append("Invalid protocol - only HTTP/HTTPS allowed")
+            return validation_result
+        
+        # Security: Reject localhost/private IPs
+        dangerous_hosts = ['localhost', '127.0.0.1', '192.168.', '10.0.', '172.16.']
+        if any(host in url.lower() for host in dangerous_hosts):
+            validation_result["is_valid"] = False
+            validation_result["issues"].append("Cannot scrape private/local addresses")
+            return validation_result
+        
         # Check for YouTube URLs
         if "youtube.com/watch" in url.lower() or "youtu.be/" in url.lower():
             validation_result["url_type"] = "youtube"
@@ -603,17 +621,19 @@ class ScrapingService:
             last_error = None
             for header_profile in (primary_headers, fallback_headers):
                 try:
-                    response = requests.get(url, headers=header_profile, timeout=20)
-                    response.raise_for_status()
+                    async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+                        resp = await client.get(url, headers=header_profile)
+                        resp.raise_for_status()
+                        response = resp
                     break
-                except requests.HTTPError as http_err:
+                except httpx.HTTPStatusError as http_err:
                     last_error = http_err
-                    status = getattr(http_err.response, "status_code", None)
+                    status = http_err.response.status_code
                     # Retry with fallback headers if access is forbidden/unauthorized.
                     if status in (401, 403, 429):
                         continue
                     raise HTTPException(status_code=400, detail=f"Scraping failed: {str(http_err)}")
-                except requests.RequestException as req_err:
+                except httpx.RequestError as req_err:
                     raise HTTPException(status_code=400, detail=f"Scraping failed: {str(req_err)}")
 
             if response is None:

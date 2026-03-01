@@ -11,7 +11,7 @@ declare global {
 function createAuthPrismaClient() {
   const baseUrl = process.env.AUTH_DATABASE_URL || process.env.DATABASE_URL || ''
   const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
-  const url = `${urlWithoutParams}?sslmode=require&connection_limit=5&pool_timeout=30&connect_timeout=30`
+  const url = `${urlWithoutParams}?sslmode=require&connection_limit=2&pool_timeout=20&connect_timeout=15`
 
   return new PrismaClient({
     datasources: { db: { url } },
@@ -34,7 +34,7 @@ function createNewsPrismaClient() {
   }
 
   const urlWithoutParams = baseUrl.split('?')[0] || baseUrl
-  const url = `${urlWithoutParams}?sslmode=require&connection_limit=5&pool_timeout=30&connect_timeout=30`
+  const url = `${urlWithoutParams}?sslmode=require&connection_limit=2&pool_timeout=20&connect_timeout=15`
 
   return new PrismaClient({
     datasources: { db: { url } },

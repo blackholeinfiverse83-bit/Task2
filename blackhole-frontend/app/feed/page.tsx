@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import BackendStatus from '@/components/BackendStatus'
@@ -94,162 +94,21 @@ export default function NewsFeed() {
   }
 
   const loadNewsFeed = async () => {
-    console.log('🔄 loadNewsFeed called')
-    // Load only from server file
     let articles: NewsItem[] = []
     try {
-      console.log('📰 Fetching from /api/scraped-news...')
       const response = await fetch('/api/scraped-news')
-      console.log('📰 Response status:', response.status)
       if (response.ok) {
         const data = await response.json()
-        console.log('📰 Response data:', data)
         if (Array.isArray(data?.data)) {
           articles = mapSavedItemsToNews(data.data as SavedNewsItem[])
-          console.log('📰 Mapped articles:', articles.length)
         }
       }
     } catch (error) {
-      console.warn('❌ Failed to load articles:', error)
+      console.error('Failed to load articles:', error)
     }
 
-    console.log('📰 Total news loaded:', articles.length)
-
     // Sample news items - in production, this would come from an API
-    const sampleNews: NewsItem[] = [
-      {
-        id: '1',
-        title: 'Breaking: Major AI Breakthrough in Natural Language Processing',
-        description: 'Researchers announce significant advancement in AI language models, enabling more accurate and context-aware responses.',
-        url: 'https://www.bbc.com/news/technology',
-        source: 'BBC News',
-        category: 'technology',
-        imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-        publishedAt: '2 hours ago',
-        readTime: '5 min read'
-      },
-      {
-        id: '2',
-        title: 'Global Climate Summit Reaches Historic Agreement',
-        description: 'World leaders commit to ambitious new targets for carbon emission reductions by 2030.',
-        url: 'https://www.reuters.com/sustainability/climate-energy/',
-        source: 'Reuters',
-        category: 'environment',
-        imageUrl: 'https://images.unsplash.com/photo-1569163139394-de4798aa62b3?w=800',
-        publishedAt: '4 hours ago',
-        readTime: '7 min read'
-      },
-      {
-        id: '3',
-        title: 'Tech Giants Announce Major Partnership in Quantum Computing',
-        description: 'Leading technology companies join forces to accelerate quantum computing research and development.',
-        url: 'https://www.theverge.com/tech',
-        source: 'The Verge',
-        category: 'technology',
-        imageUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800',
-        publishedAt: '6 hours ago',
-        readTime: '4 min read'
-      },
-      {
-        id: '4',
-        title: 'Stock Markets Rally on Positive Economic Data',
-        description: 'Major indices see significant gains following better-than-expected employment and inflation figures.',
-        url: 'https://www.cnbc.com/world-markets/',
-        source: 'CNBC',
-        category: 'business',
-        imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
-        publishedAt: '8 hours ago',
-        readTime: '6 min read'
-      },
-      {
-        id: '5',
-        title: 'New Study Reveals Health Benefits of Mediterranean Diet',
-        description: 'Long-term research shows significant improvements in cardiovascular health and longevity.',
-        url: 'https://www.theguardian.com/science',
-        source: 'The Guardian',
-        category: 'health',
-        imageUrl: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800',
-        publishedAt: '10 hours ago',
-        readTime: '5 min read'
-      },
-      {
-        id: '6',
-        title: 'Space Agency Announces Plans for Mars Mission',
-        description: 'Ambitious new timeline set for crewed mission to Mars, with launch targeted for 2030.',
-        url: 'https://www.space.com/news',
-        source: 'Space.com',
-        category: 'science',
-        imageUrl: 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=800',
-        publishedAt: '12 hours ago',
-        readTime: '8 min read'
-      },
-      {
-        id: '7',
-        title: 'Cybersecurity Alert: New Vulnerability Discovered',
-        description: 'Security researchers identify critical flaw affecting millions of devices worldwide.',
-        url: 'https://www.wired.com/category/security/',
-        source: 'Wired',
-        category: 'technology',
-        imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800',
-        publishedAt: '14 hours ago',
-        readTime: '6 min read'
-      },
-      {
-        id: '8',
-        title: 'Entertainment Industry Embraces Virtual Reality',
-        description: 'Major studios announce slate of VR experiences, signaling shift in entertainment consumption.',
-        url: 'https://variety.com/v/digital/',
-        source: 'Variety',
-        category: 'entertainment',
-        imageUrl: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=800',
-        publishedAt: '16 hours ago',
-        readTime: '5 min read'
-      },
-      {
-        id: '9',
-        title: 'Electric Vehicle Sales Surge in Major Markets',
-        description: 'Latest figures show record adoption rates as prices decline and charging infrastructure expands.',
-        url: 'https://www.cnn.com/business/tech',
-        source: 'CNN Business',
-        category: 'business',
-        imageUrl: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800',
-        publishedAt: '18 hours ago',
-        readTime: '4 min read'
-      },
-      {
-        id: '10',
-        title: 'Breakthrough in Renewable Energy Storage Technology',
-        description: 'Scientists develop new battery technology promising longer lifespan and faster charging.',
-        url: 'https://www.scientificamerican.com/energy-sustainability/',
-        source: 'Scientific American',
-        category: 'science',
-        imageUrl: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800',
-        publishedAt: '20 hours ago',
-        readTime: '7 min read'
-      },
-      {
-        id: '11',
-        title: 'Global Education Initiative Reaches 1 Million Students',
-        description: 'International program providing free online education celebrates major milestone.',
-        url: 'https://www.edweek.org/technology',
-        source: 'Education Week',
-        category: 'education',
-        imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800',
-        publishedAt: '22 hours ago',
-        readTime: '5 min read'
-      },
-      {
-        id: '12',
-        title: 'Artificial Intelligence in Healthcare Shows Promise',
-        description: 'AI diagnostic tools demonstrate accuracy comparable to experienced physicians in recent trials.',
-        url: 'https://www.healthcareitnews.com/',
-        source: 'Healthcare IT News',
-        category: 'health',
-        imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800',
-        publishedAt: '1 day ago',
-        readTime: '6 min read'
-      }
-    ]
+    const sampleNews: NewsItem[] = []
 
 
     const finalNews = articles.length > 0 ? articles : sampleNews
@@ -280,17 +139,15 @@ export default function NewsFeed() {
     { id: 'education', name: 'Education', icon: Clock }
   ]
 
-  const filteredNews = newsItems.filter(item => {
-    // Safety check: ensure item has required properties
+  const filteredNews = useMemo(() => newsItems.filter(item => {
     if (!item || typeof item !== 'object') return false
-
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
     const title = String(item.title || '')
     const description = String(item.description || '')
     const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       description.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
-  })
+  }), [newsItems, selectedCategory, searchQuery])
 
   const handleAnalyzeArticle = (url: string) => {
     // Navigate to home page with the URL pre-filled
@@ -307,24 +164,12 @@ export default function NewsFeed() {
 
   const handleRemoveArticle = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('🗑️ Delete button clicked for:', id)
     if (confirm('Remove this article permanently?')) {
       try {
-        console.log('🗑️ Sending DELETE request to /api/scraped-news?id=' + id)
-        const response = await fetch(`/api/scraped-news?id=${id}`, { method: 'DELETE' })
-        console.log('🗑️ DELETE response status:', response.status)
-        const result = await response.json()
-        console.log('🗑️ DELETE response body:', result)
-        
-        console.log('🗑️ Updating UI state, removing article:', id)
-        setNewsItems(prev => {
-          const filtered = prev.filter(item => item.id !== id)
-          console.log('🗑️ Articles before:', prev.length, 'after:', filtered.length)
-          return filtered
-        })
-        console.log('✅ Article deletion complete')
+        await fetch(`/api/scraped-news?id=${id}`, { method: 'DELETE' })
+        setNewsItems(prev => prev.filter(item => item.id !== id))
       } catch (error) {
-        console.error('❌ Failed to delete:', error)
+        console.error('Failed to delete:', error)
       }
     }
   }
@@ -413,9 +258,9 @@ export default function NewsFeed() {
                     <img
                       src={news.imageUrl}
                       alt={news.title}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       onError={(e) => {
-                        // Fallback to gradient background if image fails to load
                         const target = e.target as HTMLImageElement
                         target.style.display = 'none'
                       }}

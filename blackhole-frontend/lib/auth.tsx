@@ -42,6 +42,8 @@ function saveSession(token: string, user: User) {
     sessionStorage.setItem('auth_token', token)
     sessionStorage.setItem('auth_user', JSON.stringify(user))
     sessionStorage.setItem('auth_expires_at', String(Date.now() + SESSION_DURATION_MS))
+    // Also save for lib/security.ts to use when signing requests
+    localStorage.setItem('jwt_token', token)
   } catch { }
 }
 
@@ -50,6 +52,7 @@ function clearSession() {
     sessionStorage.removeItem('auth_token')
     sessionStorage.removeItem('auth_user')
     sessionStorage.removeItem('auth_expires_at')
+    localStorage.removeItem('jwt_token')
   } catch { }
 }
 

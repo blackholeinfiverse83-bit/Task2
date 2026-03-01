@@ -169,56 +169,7 @@ async function runLegacyWorkflow(url: string): Promise<WorkflowResult> {
 /**
  * Maps the new backend response (BHIV + Pipeline) to the Frontend WorkflowResult interface
  */
-function mapToWorkflowResult(data: any): WorkflowResult {
-  const seeya = data.seeya_compat || {}
-  const pipeline = data.pipelineResult || {}
-
-  return {
-    success: data.success,
-    data: {
-      url: seeya.source_url || '',
-      timestamp: new Date().toISOString(),
-      workflow_steps: ['fetch', 'filter', 'verify', 'script', 'feedback'],
-      processing_time: {
-        scraping: 1.5,
-        vetting: pipeline.processingTime ? pipeline.processingTime / 1000 : 2.0,
-        summarization: 1.0,
-        prompt_generation: 0.5,
-        video_search: 1.0
-      },
-      scraped_data: {
-        title: seeya.title || 'Untitled',
-        content_length: 500,
-        author: 'AI Agent',
-        date: new Date().toLocaleDateString()
-      },
-      vetting_results: {
-        authenticity_score: Math.round((pipeline.finalRewardScore || 0.85) * 100),
-        credibility_rating: (pipeline.finalRewardScore || 0.85) > 0.8 ? 'High' : 'Medium',
-        is_reliable: (pipeline.finalRewardScore || 0.85) > 0.7
-      },
-      summary: {
-        text: data.newsItem?.summary?.medium || 'Summary not available',
-        original_length: 1000,
-        summary_length: 200,
-        compression_ratio: 0.2
-      },
-      video_prompt: {
-        prompt: data.newsItem?.script?.headline || 'Create a news report about the event',
-        for_video_creation: true,
-        based_on_summary: true
-      },
-      sidebar_videos: {
-        videos: [],
-        total_found: 0,
-        ready_for_playback: false
-      },
-      total_processing_time: pipeline.processingTime || 0,
-      workflow_complete: true,
-      steps_completed: 5
-    }
-  }
-}
+// NOTE: mapToWorkflowResult was removed — it was dead code with hardcoded fallback values.
 
 
 export async function testIndividualTool(tool: string, payload: any): Promise<any> {
@@ -387,87 +338,52 @@ export interface FeedbackResponse {
  */
 export async function getSankalpFeed(): Promise<SankalpFeedResponse> {
   try {
-    // Check if backend is available first
-    const isBackendAvailable = await checkBackendHealth()
-    if (!isBackendAvailable) {
-      // Backend not available, return empty feed silently
-      return { items: [] }
-    }
+    // NOTE: Removed redundant checkBackendHealth() call here.
+    // The caller (page.tsx loadNewsFeed) already checks backend availability.
 
     const url = `${SANKALP_API_BASE}/exports/weekly_report.json`
     const secureHeaders = await buildSecureHeaders(url, 'GET')
-
-    // Create abort controller for timeout
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-    // Try to fetch from weekly_report.json endpoint
-    // If Sankalp doesn't expose this, we'll need to adjust
-    let response: Response
     try {
-      response = await fetch(url, {
+      const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...secureHeaders,
-        },
+        headers: { 'Content-Type': 'application/json', ...secureHeaders },
         signal: controller.signal,
       })
       clearTimeout(timeoutId)
+      if (!response.ok) throw new Error('Not found')
+      const data = await response.json()
+      return { items: data?.items || [], generated_at: data?.generated_at }
     } catch (fetchError) {
       clearTimeout(timeoutId)
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        // Timeout - return empty feed
-        return { items: [] }
-      }
-      throw fetchError
-    }
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') return { items: [] }
 
-    if (!response.ok) {
-      // Fallback: try sample_integration.json
       const fallbackUrl = `${SANKALP_API_BASE}/exports/sample_integration.json`
       const fallbackHeaders = await buildSecureHeaders(fallbackUrl, 'GET')
       const fallbackController = new AbortController()
       const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 5000)
-
-      let fallbackResponse: Response
       try {
-        fallbackResponse = await fetch(fallbackUrl, {
+        const fallbackResponse = await fetch(fallbackUrl, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            ...fallbackHeaders,
-          },
+          headers: { 'Content-Type': 'application/json', ...fallbackHeaders },
           signal: fallbackController.signal,
         })
         clearTimeout(fallbackTimeoutId)
-      } catch (fetchError) {
+        if (!fallbackResponse.ok) return { items: [] }
+        const data = await fallbackResponse.json()
+        return { items: data?.items || [] }
+      } catch (e) {
         clearTimeout(fallbackTimeoutId)
-        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-          // Timeout - return empty feed
-          return { items: [] }
-        }
-        throw fetchError
-      }
-
-      if (!fallbackResponse.ok) {
-        // Silently return empty feed instead of throwing
         return { items: [] }
       }
-
-      const data = await fallbackResponse.json()
-      return { items: data.items || [] }
     }
-
-    const data = await response.json()
-    return { items: data.items || [], generated_at: data.generated_at }
   } catch (error) {
-    // Only log error once to prevent console spam
     if (!(error as any).__logged) {
-      console.warn('⚠️ Sankalp feed unavailable (backend may be offline):', error instanceof Error ? error.message : 'Unknown error')
+      console.warn('⚠️ Sankalp feed unavailable')
         ; (error as any).__logged = true
     }
-    // Return empty feed on error
     return { items: [] }
   }
 }

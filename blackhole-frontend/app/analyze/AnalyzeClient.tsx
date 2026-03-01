@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 import NewsAnalysisCard from '@/components/NewsAnalysisCard'
 import VideoPlayer from '@/components/VideoPlayer'
@@ -8,6 +8,10 @@ import ResultsDisplay from '@/components/ResultsDisplay'
 import BackendStatus from '@/components/BackendStatus'
 import { checkBackendHealth } from '@/lib/api'
 import { saveScrapedNews, getSavedNews } from '@/lib/newsStorage'
+
+function sanitizeLog(input: string): string {
+  return String(input).replace(/[\n\r]/g, ' ').slice(0, 100)
+}
 
 interface AnalysisResults {
   scraped_data?: {
@@ -68,20 +72,12 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [analyzedUrl, setAnalyzedUrl] = useState<string>('')
   const [showSavedNotification, setShowSavedNotification] = useState(false)
-  const [feedVideos, setFeedVideos] = useState<
-    Array<{
-      title: string
-      url: string
-      thumbnail?: string
-      duration?: string
-      source: string
-    }>
-  >([])
+  const [feedVideos, setFeedVideos] = useState<Array<{ title: string; url: string; thumbnail?: string; duration?: string; source: string }>>([])
 
   useEffect(() => {
     checkBackend()
     loadFeedVideos()
-    const interval = setInterval(checkBackend, 30000) // Check every 30 seconds
+    const interval = setInterval(checkBackend, 60000) // Check every 60 seconds
 
     // Listen for new articles being saved
     const handleNewsSaved = () => {
@@ -146,7 +142,7 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
 
       setFeedVideos(allVideos)
     } catch (error) {
-      console.error('Error loading feed videos:', error)
+      console.error('Error loading feed videos:', error instanceof Error ? sanitizeLog(error.message) : 'Unknown error')
       setFeedVideos([])
     }
   }
@@ -160,21 +156,24 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
     }
   }
 
-  const handleAnalysisComplete = (results: AnalysisResults) => {
+  const handleAnalysisComplete = (results: AnalysisResults | null) => {
     console.log('📊 Analysis results received:', {
       hasResults: !!results,
       resultKeys: results ? Object.keys(results) : [],
       summary: results?.summary ? 'Present' : 'Missing',
       vettingResults: results?.vetting_results ? 'Present' : 'Missing',
       scrapedData: results?.scraped_data ? 'Present' : 'Missing',
-      analyzedUrl: analyzedUrl,
-      resultsUrl: (results as any)?.url,
-      scrapedDataUrl: (results as any)?.scraped_data?.url,
-      fullResults: results,
+      analyzedUrl: sanitizeLog(analyzedUrl),
+      resultsUrl: sanitizeLog((results as any)?.url || ''),
+      scrapedDataUrl: sanitizeLog((results as any)?.scraped_data?.url || ''),
     })
     setAnalysisResults(results)
     setIsAnalyzing(false)
     setCurrentStep(0)
+
+    if (!results) {
+      return
+    }
 
     // Extract URL from results if analyzedUrl is not set - check multiple locations
     const articleUrl =
@@ -185,10 +184,10 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
       ''
 
     console.log('🔍 URL extraction:', {
-      analyzedUrl,
-      resultsUrl: (results as any)?.url,
-      scrapedDataUrl: (results as any)?.scraped_data?.url,
-      finalArticleUrl: articleUrl,
+      analyzedUrl: sanitizeLog(analyzedUrl),
+      resultsUrl: sanitizeLog((results as any)?.url || ''),
+      scrapedDataUrl: sanitizeLog((results as any)?.scraped_data?.url || ''),
+      finalArticleUrl: sanitizeLog(articleUrl),
       hasArticleUrl: !!articleUrl,
     })
 
@@ -196,19 +195,19 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
     if (results && articleUrl && articleUrl.trim() !== '') {
       try {
         console.log('💾 Attempting to save article:', {
-          url: articleUrl,
+          url: sanitizeLog(articleUrl),
           hasResults: !!results,
           resultsStructure: Object.keys(results),
         })
 
         const saved = saveScrapedNews(results, articleUrl)
         if (saved) {
-          console.log('✅ News article saved to feed:', saved.title, {
+          console.log('✅ News article saved to feed:', sanitizeLog(saved.title), {
             category: saved.category,
-            imageUrl: saved.imageUrl,
+            imageUrl: saved.imageUrl ? 'present' : 'missing',
             hasImage: !!saved.imageUrl,
-            id: saved.id,
-            url: saved.url,
+            id: sanitizeLog(saved.id),
+            url: sanitizeLog(saved.url),
           })
           // Show notification
           setShowSavedNotification(true)
@@ -225,31 +224,31 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
           }
         } else {
           console.warn('⚠️ Failed to save article to feed - saveScrapedNews returned null', {
-            url: articleUrl,
-            results: results,
+            url: sanitizeLog(articleUrl),
+            hasResults: !!results,
           })
         }
       } catch (error) {
-        console.error('❌ Error saving news to feed:', error)
+        console.error('❌ Error saving news to feed:', error instanceof Error ? sanitizeLog(error.message) : 'Unknown error')
       }
     } else {
       console.warn('⚠️ Cannot save article - missing data:', {
         hasResults: !!results,
         hasUrl: !!articleUrl,
-        articleUrlValue: articleUrl,
-        analyzedUrl: analyzedUrl,
-        resultsUrl: (results as any)?.url,
-        scrapedDataUrl: (results as any)?.scraped_data?.url,
+        articleUrlValue: sanitizeLog(articleUrl),
+        analyzedUrl: sanitizeLog(analyzedUrl),
+        resultsUrl: sanitizeLog((results as any)?.url || ''),
+        scrapedDataUrl: sanitizeLog((results as any)?.scraped_data?.url || ''),
       })
 
       // Try to save anyway if we have results, even without URL (use a fallback)
       if (results) {
         const fallbackUrl = (results as any)?.url || `scraped-${Date.now()}`
-        console.log('🔄 Attempting save with fallback URL:', fallbackUrl)
+        console.log('🔄 Attempting save with fallback URL:', sanitizeLog(fallbackUrl))
         try {
           const saved = saveScrapedNews(results, fallbackUrl)
           if (saved) {
-            console.log('✅ Article saved with fallback URL:', saved.title)
+            console.log('✅ Article saved with fallback URL:', sanitizeLog(saved.title))
             setShowSavedNotification(true)
             setTimeout(() => setShowSavedNotification(false), 5000)
             loadFeedVideos()
@@ -259,11 +258,13 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
             }
           }
         } catch (error) {
-          console.error('❌ Error saving with fallback URL:', error)
+          console.error('❌ Error saving with fallback URL:', error instanceof Error ? sanitizeLog(error.message) : 'Unknown error')
         }
       }
     }
   }
+
+  const stepTimersRef = useRef<NodeJS.Timeout[]>([])
 
   const handleAnalysisStart = (url: string) => {
     setAnalyzedUrl(url)
@@ -271,12 +272,21 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
     setAnalysisResults(null)
     setCurrentStep(0)
 
-    // Simulate workflow steps for UI feedback
+    // Clear any previous timers
+    stepTimersRef.current.forEach(t => clearTimeout(t))
+    stepTimersRef.current = []
+
+    // Visual progress feedback — steps advance gradually while waiting
     const steps = ['scraping', 'vetting', 'summarization', 'prompt_generation', 'video_search']
     steps.forEach((_, index) => {
-      setTimeout(() => {
-        setCurrentStep(index + 1)
+      const timer = setTimeout(() => {
+        // Only advance if still analyzing (hasn't completed yet)
+        setIsAnalyzing(prev => {
+          if (prev) setCurrentStep(index + 1)
+          return prev
+        })
       }, (index + 1) * 2000)
+      stepTimersRef.current.push(timer)
     })
   }
 
@@ -424,4 +434,3 @@ export default function AnalyzeClient({ initialUrl }: AnalyzeClientProps) {
     </div>
   )
 }
-

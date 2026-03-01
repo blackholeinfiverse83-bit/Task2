@@ -7,6 +7,8 @@ interface BackendStatusProps {
   onRetry: () => void
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000'
+
 export default function BackendStatus({ status, onRetry }: BackendStatusProps) {
   if (status === 'online') {
     return (
@@ -22,7 +24,7 @@ export default function BackendStatus({ status, onRetry }: BackendStatusProps) {
         </div>
         <div className="flex items-center space-x-2">
           <a
-            href="http://localhost:8000/docs"
+            href={`${BACKEND_URL}/docs`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-green-400 hover:text-green-300 transition-colors"
@@ -64,10 +66,10 @@ export default function BackendStatus({ status, onRetry }: BackendStatusProps) {
         <div className="flex-1">
           <h4 className="text-red-400 font-medium mb-2">Backend Offline</h4>
           <p className="text-red-300 text-sm mb-4">
-            The Blackhole Infiverse LLP backend server is not responding. 
+            The Blackhole Infiverse LLP backend server is not responding.
             Please start the backend to use the unified workflow.
           </p>
-          
+
           {/* Instructions */}
           <div className="bg-black/30 rounded-lg p-4 mb-4">
             <h5 className="text-white font-medium mb-2 flex items-center">
@@ -92,13 +94,13 @@ export default function BackendStatus({ status, onRetry }: BackendStatusProps) {
             <h5 className="text-white font-medium mb-2">Expected URLs:</h5>
             <div className="space-y-1 text-sm">
               <div className="text-gray-300">
-                🌐 API: <code className="text-blue-400">http://localhost:8000</code>
+                🌐 API: <code className="text-blue-400">{BACKEND_URL}</code>
               </div>
               <div className="text-gray-300">
-                📚 Docs: <code className="text-blue-400">http://localhost:8000/docs</code>
+                📚 Docs: <code className="text-blue-400">{BACKEND_URL}/docs</code>
               </div>
               <div className="text-gray-300">
-                ❤️ Health: <code className="text-blue-400">http://localhost:8000/health</code>
+                ❤️ Health: <code className="text-blue-400">{BACKEND_URL}/health</code>
               </div>
             </div>
           </div>
@@ -112,9 +114,9 @@ export default function BackendStatus({ status, onRetry }: BackendStatusProps) {
               <RefreshCw className="w-4 h-4" />
               <span>Retry Connection</span>
             </button>
-            
+
             <a
-              href="http://localhost:8000"
+              href={BACKEND_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
