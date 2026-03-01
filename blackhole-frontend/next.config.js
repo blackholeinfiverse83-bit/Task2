@@ -3,13 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // Standalone output for smaller deployments and faster cold starts on Render
-  output: 'standalone',
-
-  // Image optimization — disabled on Render free tier (insufficient CPU)
-  images: {
-    unoptimized: true,
-  },
 
   // Performance optimizations
   compress: true,
