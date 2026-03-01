@@ -46,7 +46,6 @@ export default function Header({ backendStatus }: HeaderProps) {
     { href: '/live', label: '🔴 Live Dashboard', id: 'live' },
     { href: '/analyze', label: '🔬 Analyze', id: 'analyze' },
     { href: '/dashboard', label: '📊 Analytics', id: 'dashboard' },
-    { href: '/advanced', label: '🧪 Advanced', id: 'advanced' },
   ]
 
   const isActive = (href: string) => {
@@ -215,7 +214,7 @@ export default function Header({ backendStatus }: HeaderProps) {
                 <User className="w-4 h-4 text-purple-400" />
                 <span className="text-sm text-gray-300">{user?.email?.split('@')[0] || 'User'}</span>
               </div>
-              
+
               {/* Logout Button */}
               <button
                 onClick={logout}
@@ -277,14 +276,14 @@ export default function Header({ backendStatus }: HeaderProps) {
                   <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
                   <span className="text-sm text-gray-300">{getStatusText()}</span>
                 </div>
-                
+
                 {user && (
                   <div className="flex items-center space-x-2 text-sm text-gray-300">
                     <User className="w-4 h-4 text-purple-400" />
                     <span>{user.email}</span>
                   </div>
                 )}
-                
+
                 <button
                   onClick={() => {
                     logout()
