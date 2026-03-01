@@ -34,7 +34,7 @@ services:
     plan: free
     branch: master
     rootDir: blackhole-frontend
-    buildCommand: npm ci --include=dev && npx prisma generate && NODE_OPTIONS="--max-old-space-size=384" npm run build
+    buildCommand: npm ci --include=dev && npx prisma generate && NODE_OPTIONS="--max-old-space-size=384" npm run build && cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static
     startCommand: node .next/standalone/server.js
     envVars:
       - key: NODE_VERSION
