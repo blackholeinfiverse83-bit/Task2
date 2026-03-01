@@ -1,5 +1,5 @@
-const API_BASE = process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000'
-const SANKALP_API_BASE = process.env.NEXT_PUBLIC_SANKALP_API_BASE || 'http://localhost:8000'
+const API_BASE = (process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000').replace(/\/+$/, '')
+const SANKALP_API_BASE = (process.env.NEXT_PUBLIC_SANKALP_API_BASE || 'http://localhost:8000').replace(/\/+$/, '')
 
 export interface WorkflowResult {
   success: boolean

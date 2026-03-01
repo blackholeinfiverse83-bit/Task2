@@ -7,7 +7,7 @@ interface BackendStatusProps {
   onRetry: () => void
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000'
+const BACKEND_URL = (process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000').replace(/\/+$/, '')
 
 export default function BackendStatus({ status, onRetry }: BackendStatusProps) {
   if (status === 'online') {

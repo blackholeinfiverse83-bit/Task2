@@ -6,7 +6,7 @@
 
 import { buildSecureHeaders } from '../lib/security'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_NOOPUR_API_BASE || 'http://localhost:8000').replace(/\/+$/, '');
 
 // Check if real backend is available
 let backendAvailable = false;
