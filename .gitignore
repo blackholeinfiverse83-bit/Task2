@@ -26,6 +26,9 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# Windows reserved device names (accidentally created)
+nul
+
 # IDE
 .vscode/
 .idea/
