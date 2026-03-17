@@ -1,11 +1,8 @@
 /**
  * Auth API Service
- * Wraps all calls to the external JWT authentication microservice.
- * Base URL: process.env.NEXT_PUBLIC_AUTH_API_URL
+ * Routes all auth calls through Next.js API proxy routes to avoid CORS issues.
+ * Browser → /api/auth/* (same-origin) → external microservice (server-to-server)
  */
-
-const AUTH_BASE_URL =
-  process.env.NEXT_PUBLIC_AUTH_API_URL || 'https://ai-being-ecwj.onrender.com'
 
 const AUTH_TOKEN_KEY = 'authToken'
 
@@ -55,16 +52,17 @@ export interface AuthResponse {
 }
 
 // ---------- API methods ----------
+// All calls now go through same-origin Next.js API routes (no CORS issues)
 
 /**
- * POST /api/auth/signup
+ * POST /api/auth/signup  (proxied server-side to external microservice)
  */
 export async function signup(
   name: string,
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  const res = await fetch(`${AUTH_BASE_URL}/api/auth/signup`, {
+  const res = await fetch('/api/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
@@ -72,19 +70,21 @@ export async function signup(
 
   const data = await res.json()
   if (!res.ok) {
-    throw new Error(data.message || data.error || 'Signup failed')
+    throw new Error(data.error || data.message || 'Signup failed')
   }
-  return data as AuthResponse
+  // Proxy returns { success, data: { token, user, message } }
+  const payload = data.data || data
+  return { token: payload.token, user: payload.user } as AuthResponse
 }
 
 /**
- * POST /api/auth/login
+ * POST /api/auth/login  (proxied server-side to external microservice)
  */
 export async function login(
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  const res = await fetch(`${AUTH_BASE_URL}/api/auth/login`, {
+  const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -92,17 +92,19 @@ export async function login(
 
   const data = await res.json()
   if (!res.ok) {
-    throw new Error(data.message || data.error || 'Invalid email or password')
+    throw new Error(data.error || data.message || 'Invalid email or password')
   }
-  return data as AuthResponse
+  // Proxy returns { success, data: { token, user } }
+  const payload = data.data || data
+  return { token: payload.token, user: payload.user } as AuthResponse
 }
 
 /**
- * GET /api/auth/me
+ * GET /api/auth/verify  (proxied server-side to external GET /api/auth/me)
  * Restores the session from a stored JWT.
  */
 export async function getMe(token: string): Promise<AuthUser> {
-  const res = await fetch(`${AUTH_BASE_URL}/api/auth/me`, {
+  const res = await fetch('/api/auth/verify', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -112,19 +114,20 @@ export async function getMe(token: string): Promise<AuthUser> {
 
   const data = await res.json()
   if (!res.ok) {
-    throw new Error(data.message || data.error || 'Session invalid')
+    throw new Error(data.error || data.message || 'Session invalid')
   }
-  // Microservice returns { user: { id, name, email } }
-  return (data.user || data) as AuthUser
+  // Proxy returns { success, data: { user } }
+  const payload = data.data || data
+  return (payload.user || payload) as AuthUser
 }
 
 /**
- * POST /api/auth/logout
- * Fire-and-forget — clears the client token regardless of server response.
+ * POST /api/auth/logout  (proxied server-side — fire-and-forget)
+ * Clears the client token regardless of server response.
  */
 export async function logout(token: string): Promise<void> {
   // Fire-and-forget; don't await or throw
-  fetch(`${AUTH_BASE_URL}/api/auth/logout`, {
+  fetch('/api/auth/logout', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
