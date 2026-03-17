@@ -4,9 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
 
 export default function ForgotPasswordPage() {
     const router = useRouter()
+    const { resetPassword } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [error, setError] = useState('')
@@ -18,20 +20,11 @@ export default function ForgotPasswordPage() {
         setError('')
 
         try {
-            const response = await fetch('/api/auth/forgot-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email })
-            })
-
-            const data = await response.json()
-
-            if (data.success) {
+            const result = await resetPassword(email)
+            if (result.success) {
                 setSuccess(true)
             } else {
-                setError(data.error || 'Failed to send reset link')
+                setError(result.error || 'Failed to send reset link')
             }
         } catch {
             setError('An error occurred. Please try again.')

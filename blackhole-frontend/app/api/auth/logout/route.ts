@@ -1,28 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 
+const AUTH_BASE_URL =
+  process.env.NEXT_PUBLIC_AUTH_API_URL || 'https://ai-being-ecwj.onrender.com'
+
+/**
+ * Proxy POST /api/auth/logout → external microservice (fire-and-forget).
+ * The microservice is stateless; real cleanup is done client-side.
+ */
 export async function POST(request: NextRequest) {
-  try {
-    const { token } = await request.json()
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Token is required' },
-        { status: 400 }
-      )
-    }
-
-    // Delete session
-    await prisma.session.deleteMany({
-      where: { token }
+  if (token) {
+    // Best-effort notify the microservice — don't await
+    fetch(`${AUTH_BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }).catch(() => {
+      // Intentionally ignored
     })
-
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Logout error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
   }
+
+  return NextResponse.json({
+    success: true,
+    message: 'Logged out successfully. Clear authToken on the client side.',
+  })
 }

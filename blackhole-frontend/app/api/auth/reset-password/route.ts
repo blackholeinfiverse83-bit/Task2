@@ -1,82 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { getUserModel } from '@/models/User'
+import { getAuthDb } from '@/lib/mongodb'
+import mongoose from 'mongoose'
+
+// Reuse the PasswordReset model
+const passwordResetSchema = new mongoose.Schema(
+  {
+    token: { type: String, required: true, unique: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    expiresAt: { type: Date, required: true },
+    usedAt: { type: Date, default: null },
+  },
+  { timestamps: true, collection: 'password_resets' }
+)
+
+async function getPasswordResetModel() {
+  const conn = await getAuthDb()
+  return conn.models.PasswordReset || conn.model('PasswordReset', passwordResetSchema)
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, password } = await request.json()
+    const { token, newPassword } = await request.json()
 
-    if (!token || !password) {
+    if (!token || !newPassword) {
       return NextResponse.json(
-        { success: false, error: 'Token and password are required' },
+        { success: false, error: 'Token and new password are required' },
         { status: 400 }
       )
     }
 
-    if (password.length < 8) {
+    if (newPassword.length < 6) {
       return NextResponse.json(
-        { success: false, error: 'Password must be at least 8 characters' },
+        { success: false, error: 'Password must be at least 6 characters' },
         { status: 400 }
       )
     }
 
-    // Find reset record
-    const reset = await prisma.passwordReset.findUnique({
-      where: { token },
-      include: { user: true }
+    const PasswordReset = await getPasswordResetModel()
+    const resetRecord = await PasswordReset.findOne({
+      token,
+      usedAt: null,
+      expiresAt: { $gt: new Date() },
     })
 
-    if (!reset) {
+    if (!resetRecord) {
       return NextResponse.json(
-        { success: false, error: 'Invalid or expired token' },
+        { success: false, error: 'Invalid or expired reset token' },
         { status: 400 }
       )
     }
-
-    // Check if already used
-    if (reset.usedAt) {
-      return NextResponse.json(
-        { success: false, error: 'Token already used' },
-        { status: 400 }
-      )
-    }
-
-    // Check if expired
-    if (reset.expiresAt < new Date()) {
-      return NextResponse.json(
-        { success: false, error: 'Token has expired' },
-        { status: 400 }
-      )
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 10)
 
     // Update user password
-    await prisma.user.update({
-      where: { id: reset.userId },
-      data: { password: hashedPassword }
+    const User = await getUserModel()
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+    await User.findByIdAndUpdate(resetRecord.userId, {
+      password: hashedPassword,
+      updated_at: new Date(),
     })
 
-    // Mark reset token as used
-    await prisma.passwordReset.update({
-      where: { id: reset.id },
-      data: { usedAt: new Date() }
-    })
-
-    // Delete all user sessions for security
-    await prisma.session.deleteMany({
-      where: { userId: reset.userId }
-    })
+    // Mark token as used
+    resetRecord.usedAt = new Date()
+    await resetRecord.save()
 
     return NextResponse.json({
       success: true,
-      message: 'Password reset successfully'
+      message: 'Password has been reset successfully',
     })
   } catch (error) {
-    console.error('Password reset error:', error)
+    console.error('Reset password error:', error)
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Failed to reset password' },
       { status: 500 }
     )
   }

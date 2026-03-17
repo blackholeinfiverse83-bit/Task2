@@ -108,20 +108,11 @@ export default function SignupPage() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password, name })
-            })
-
-            const data = await response.json()
-
-            if (data.success) {
+            const result = await signup(email, password, name)
+            if (result.success) {
                 setSuccess(true)
             } else {
-                setError(data.error || 'Failed to create account. Please try again.')
+                setError(result.error || 'Failed to create account. Please try again.')
             }
         } catch {
             setError('An error occurred during signup. Please try again.')

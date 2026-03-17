@@ -394,22 +394,35 @@ export default function Home() {
   }
 
   const handleRemoveArticle = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
-    if (confirm('Remove this article from your feed?')) {
-      setNewsItems(newsItems.filter(item => item.id !== id))
-      const article = newsItems.find(item => item.id === id)
-      if (article?.isScraped) {
-        try {
-          await removeSavedNews(id)
-        } catch (error) {
-          console.error('Failed to remove saved news:', error)
-        }
-      }
-      // Store deleted IDs to filter them out on reload (cap at 500)
-      const deleted: string[] = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
+    
+    // 1. Optimistic UI update
+    setNewsItems(prev => prev.filter(item => item.id !== id))
+    
+    // 2. Add to local storage immediately so reload respects it
+    const deleted: string[] = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
+    if (!deleted.includes(id)) {
       deleted.push(id)
       const capped = deleted.slice(-500)
       localStorage.setItem('deleted_articles', JSON.stringify(capped))
+    }
+
+    // 3. Update the cached feed immediately
+    try {
+      const cached = JSON.parse(sessionStorage.getItem('cachedNewsItems') || '[]')
+      const newCached = cached.filter((item: any) => item.id !== id)
+      sessionStorage.setItem('cachedNewsItems', JSON.stringify(newCached))
+    } catch (e) { console.warn('Cache update failed:', e) }
+
+    // 4. Background removal from backend if it's a scraped article
+    const article = newsItems.find(item => item.id === id)
+    if (article?.isScraped) {
+      try {
+        await removeSavedNews(id)
+      } catch (error) {
+        console.error('Failed to remove saved news from backend:', error)
+      }
     }
   }
 

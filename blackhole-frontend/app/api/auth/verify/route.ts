@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 
+const AUTH_BASE_URL =
+  process.env.NEXT_PUBLIC_AUTH_API_URL || 'https://ai-being-ecwj.onrender.com'
+
+/**
+ * Proxy GET /api/auth/verify → external microservice GET /api/auth/me
+ * Translates the microservice response to the legacy shape
+ * ({ success: true, data: { user } }) for backwards compatibility.
+ */
 export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -12,39 +19,33 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Find session
-    const session = await prisma.session.findUnique({
-      where: { token },
-      include: { user: true }
+    const res = await fetch(`${AUTH_BASE_URL}/api/auth/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     })
 
-    if (!session || session.expiresAt < new Date()) {
-      // Delete expired session
-      if (session) {
-        await prisma.session.delete({ where: { id: session.id } })
-      }
-      
+    const data = await res.json()
+
+    if (!res.ok) {
       return NextResponse.json(
-        { success: false, error: 'Invalid or expired session' },
+        { success: false, error: data.message || data.error || 'Invalid or expired session' },
         { status: 401 }
       )
     }
 
+    const user = data.user || data
     return NextResponse.json({
       success: true,
-      data: {
-        user: {
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.name
-        }
-      }
+      data: { user },
     })
   } catch (error) {
-    console.error('Session verification error:', error)
+    console.error('Verify proxy error:', error)
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: 'Invalid or expired session' },
+      { status: 401 }
     )
   }
 }

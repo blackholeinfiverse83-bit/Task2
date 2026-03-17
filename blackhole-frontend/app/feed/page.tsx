@@ -163,14 +163,24 @@ export default function NewsFeed() {
   }
 
   const handleRemoveArticle = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
-    if (confirm('Remove this article permanently?')) {
-      try {
-        await fetch(`/api/scraped-news?id=${id}`, { method: 'DELETE' })
-        setNewsItems(prev => prev.filter(item => item.id !== id))
-      } catch (error) {
-        console.error('Failed to delete:', error)
-      }
+
+    // Optimistic UI update
+    setNewsItems(prev => prev.filter(item => item.id !== id))
+    
+    // Also add to local storage so homepage and reload honors it
+    const deleted: string[] = JSON.parse(localStorage.getItem('deleted_articles') || '[]')
+    if (!deleted.includes(id)) {
+      deleted.push(id)
+      const capped = deleted.slice(-500)
+      localStorage.setItem('deleted_articles', JSON.stringify(capped))
+    }
+
+    try {
+      await fetch(`/api/scraped-news?id=${id}`, { method: 'DELETE' })
+    } catch (error) {
+      console.error('Failed to delete from backend:', error)
     }
   }
 
