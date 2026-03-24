@@ -15,14 +15,16 @@ services:
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false
-      # AUTH DATABASE - for User, Session, etc. (existing)
-      - key: AUTH_DATABASE_URL
+      # AUTH DATABASE - for User, Session, etc. (shared with auth microservice)
+      - key: MONGODB_AUTH_URI
         sync: false
-      # NEWS DATABASE - for ScrapedNews (new separate database)
-      - key: NEWS_DATABASE_URL
+      # NEWS DATABASE - for ScrapedNews
+      - key: MONGODB_NEWS_URI
         sync: false
-      # Keep DATABASE_URL as fallback
-      - key: DATABASE_URL
+      # JWT Config
+      - key: JWT_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_AUTH_API_URL
         sync: false
       - key: NEXT_PUBLIC_NOOPUR_API_BASE
         sync: false

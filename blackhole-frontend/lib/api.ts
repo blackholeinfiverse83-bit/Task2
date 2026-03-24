@@ -389,6 +389,49 @@ export async function getSankalpFeed(): Promise<SankalpFeedResponse> {
 }
 
 /**
+ * Fetch published news from the backend's /api/news endpoint (MongoDB-backed).
+ * This provides real scraped/processed news when the static Sankalp JSON exports are empty.
+ */
+export async function getBackendNewsFeed(): Promise<SankalpFeedResponse> {
+  try {
+    const url = `${API_BASE}/api/news?status=published&limit=50`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 8000)
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      },
+      signal: controller.signal,
+    })
+    clearTimeout(timeoutId)
+
+    if (!response.ok) throw new Error(`Backend news feed failed: ${response.status}`)
+
+    const data = await response.json()
+    const items: SankalpItem[] = (data.data || []).map((item: any) => ({
+      id: item.id || '',
+      title: item.title || 'Untitled',
+      script: item.summary || '',
+      tone: item.insights?.sentiment || '',
+      language: 'en',
+      audio_path: '',
+      priority_score: 0,
+      trend_score: 0,
+      category: item.category || 'general',
+      timestamp: item.timestamp || new Date().toISOString(),
+    }))
+
+    return { items, generated_at: new Date().toISOString() }
+  } catch (error) {
+    console.warn('⚠️ Backend news feed unavailable')
+    return { items: [] }
+  }
+}
+
+/**
  * Submit feedback to the local orchestrator's feedback system
  */
 export async function submitFeedback(

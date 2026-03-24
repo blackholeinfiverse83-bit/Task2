@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import BackendStatus from '@/components/BackendStatus'
-import { checkBackendHealth, getSankalpFeed, fetchTTSAudio, type SankalpItem } from '@/lib/api'
+import { checkBackendHealth, getSankalpFeed, getBackendNewsFeed, fetchTTSAudio, type SankalpItem } from '@/lib/api'
 import { getCurrentTranslateLanguage, getTTSLanguageCode } from '@/lib/translate'
 import { getSavedNews, removeSavedNews } from '@/lib/newsStorage'
 import { Search, TrendingUp, Clock, Globe, Newspaper, Trash2, PlayCircle, X, Trophy, Landmark, Siren, Plane, UtensilsCrossed, Volume2, Loader2, Filter } from 'lucide-react'
@@ -149,10 +149,40 @@ export default function Home() {
 
     const savedArticles = await getSavedNews()
     const localScraped = mapSavedItemsToNews(savedArticles || [])
-    const allNews = mergeByUrl([...(sankalpItems || []), ...(localScraped || [])])
+
+    // Also try to load news from the scraping backend's MongoDB
+    let backendItems: NewsItem[] = []
+    try {
+      const backendFeed = await getBackendNewsFeed()
+      backendItems = (backendFeed?.items || []).map((item: SankalpItem) => ({
+        id: item.id || `backend-${Date.now()}-${Math.random()}`,
+        title: typeof item.title === 'string' ? item.title : (typeof item.script === 'string' ? item.script.substring(0, 100) : 'Untitled'),
+        description: typeof item.script === 'string' ? item.script : '',
+        url: item.id || '',
+        source: extractSourceFromUrl(item.id || ''),
+        category: item.category || 'general',
+        publishedAt: item.timestamp ? formatTimeAgo(item.timestamp) : 'Recently',
+        readTime: item.audio_duration ? `${Math.ceil(item.audio_duration)}s audio` : undefined,
+        script: typeof item.script === 'string' ? item.script : '',
+        tone: typeof item.tone === 'string' ? item.tone : '',
+        audio_path: typeof item.audio_path === 'string' ? item.audio_path : '',
+        priority_score: typeof item.priority_score === 'number' ? item.priority_score : 0,
+        trend_score: typeof item.trend_score === 'number' ? item.trend_score : 0,
+        audio_duration: typeof item.audio_duration === 'number' ? item.audio_duration : 0,
+        isScraped: false
+      }))
+      if (backendItems.length > 0) {
+        console.log('✅ Backend news feed loaded:', backendItems.length, 'items')
+      }
+    } catch (error) {
+      console.warn('⚠️ Backend news feed unavailable')
+    }
+
+    const allNews = mergeByUrl([...(sankalpItems || []), ...(backendItems || []), ...(localScraped || [])])
 
     console.log('📰 Total news loaded:', {
       sankalpCount: sankalpItems.length,
+      backendCount: backendItems.length,
       scrapedCount: localScraped.length,
       totalCount: allNews.length
     })
