@@ -62,7 +62,14 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newsItem)
-    }).catch(error => console.error('Failed to save:', error))
+    }).then(async res => {
+      if (!res.ok) {
+        const text = await res.text().catch(() => '')
+        console.error('❌ Failed to save scraped news:', res.status, text)
+      } else {
+        console.log('✅ Scraped news saved to MongoDB')
+      }
+    }).catch(error => console.error('❌ Failed to save scraped news (network):', error))
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('newsArticleSaved', { detail: newsItem }))
@@ -78,9 +85,17 @@ export function saveScrapedNews(scrapedData: any, url: string): SavedNewsItem | 
 export async function getSavedNews(): Promise<SavedNewsItem[]> {
   try {
     const response = await fetch('/api/scraped-news')
+    if (!response.ok) {
+      console.warn('⚠️ getSavedNews failed:', response.status)
+      return []
+    }
     const data = await response.json()
+    if (data.success && data.data?.length > 0) {
+      console.log('✅ Loaded', data.data.length, 'scraped articles from MongoDB')
+    }
     return data.success ? data.data : []
-  } catch {
+  } catch (error) {
+    console.warn('⚠️ getSavedNews network error:', error)
     return []
   }
 }
